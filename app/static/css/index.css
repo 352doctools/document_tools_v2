@@ -1,0 +1,77 @@
+body, h1, h2, h3, h4, h5, h6, p, dl, dt, dd, ul, ol, li, form, button, input, textarea, th, td, button {
+    margin: 0;
+    padding: 0;
+    outline: 0;
+}
+.page-bd{
+  margin:0 0 0px;
+}
+.page_top{
+            background: #05112d;
+            height:65px;
+            min-width: 1000px;
+            height: 60px;
+            position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+.page_top ul{
+            overflow: hidden;
+        }
+.page_top ul li{
+            float: left;
+            list-style: none;
+            line-height: 65px;
+            margin-left:40px
+        }
+.page_top ul li a{
+            color: #fff;
+            text-decoration: none
+        }
+
+.page_content{
+        top: 60px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        overflow: auto;
+        background: #eeeff1;
+        }
+.page_left{
+            background: #394768;
+            height: 100%;
+  			float:left;
+  			width:200px;
+            margin-right:200px;
+
+            position: fixed;
+        }
+.page_left ul{
+            overflow: hidden;
+        }
+.page_left ul li{
+            display: inline-block;
+            height: 40px;
+            line-height: 40px;
+            width: 152px;
+            position: relative;
+            font-size: 14px;
+            padding-left: 60px;
+        }
+.page_left ul li a{
+            color: #fff;
+            text-decoration: none
+        }
+.page_right{
+            margin: 20px 20px 20px 220px;
+            min-width: 950px;
+        }
+.right_part1{
+
+        }
+
+.right_part2{
+        }
