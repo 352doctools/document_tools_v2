@@ -398,15 +398,18 @@ def doc_cl_check2():
             data=dict(
                 docid="123",
                 cpcode="1300",
-                bcontent="我们公司董事⻓是((president_name))……",
+                bcontent="""
+                <p>公司控股股东((stockholder_name))以及实际控制人((controller_name))承诺：</p><p style="text-indent:2em">1、自公司股票上市之日起 36 个月内，不转让或者委托他人管理本次发行前其持有的公司股份，也不由公司回购该部分股份。</p><p style="text-indent:2em">2、在上述锁定期满后 2 年内减持的，其减持价格不低于发行价（指公司首次公开发行股票的发行价格，如果因公司上市后派发现金红利、送股、转增股本、增发新股等原因进行除权、除息的，则按照深圳证券交易所的有关规定作除权除息处理，下同）。</p><p style="text-indent:2em">3、公司上市后 6 个月内如公司股票连续 20 个交易日的收盘价均低于发行价，或者上市后 6 个月期末收盘价低于发行价，其所持公司股票的锁定期限自动延长 6 个月。</p><p style="text-indent:2em">4、在担任公司董事、监事或高级管理人员期间，每年转让持有的公司股份不超过其持有公司股份总数的 25%；离职后半年内，不转让其持有的公司股份。如在公司首次公开发行股票上市之日起 6 个月内申报离职的，自申报离职之日起 18 个月内不转让其直接持有的公司股份；在公司首次公开发行股票上市之日起第 7 个月至第 12 个月之间申报离职的，自申报离职之日起 12 个月内不转让其直接持有的公司股份。</p>
+                """,
                 rllist=[
                     dict(
-                        rlname="董事⻓姓名",
-                        rlsymbol="((president_name))"
+                        rlname="公司控股股东姓名：",
+                        rlsymbol="((stockholder_name))",
+                        note="⽂档中所有公司控股股东姓名讲被替换为输⼊内容",
                     ),
                     dict(
-                        rlname="股东姓名",
-                        rlsymbol="((stockholder_name))"
+                        rlname="实际控制人姓名：",
+                        rlsymbol="((controller_name))",
                     ),
                 ],
                 tmlist=[
