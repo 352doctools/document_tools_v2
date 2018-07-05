@@ -405,17 +405,19 @@ def doc_cl_check2():
                     dict(
                         rlname="公司控股股东姓名：",
                         rlsymbol="((stockholder_name))",
-                        note="⽂档中所有公司控股股东姓名讲被替换为输⼊内容",
+                        note="⽂档中所有公司控股股东姓名将被替换为输⼊内容",
                     ),
                     dict(
                         rlname="实际控制人姓名：",
                         rlsymbol="((controller_name))",
+                        note="⽂档中所有实际控制人姓名将被替换为输⼊内容",
                     ),
                 ],
                 tmlist=[
                     dict(
                         tmtype="risk",
                         tmname="⾏业⻛险",
+                        note="根据您选择的⾏业，将给出推荐供您参考",
                         tminputlist=[
                             dict(
                                 tminputcode="612101",
@@ -434,6 +436,7 @@ def doc_cl_check2():
                     dict(
                         tmtype="promise",
                         tmname="承诺",
+                        note="根据您选择的⾏业，将给出推荐供您参考",
                         tminputlist=[
                             dict(
                                 tminputcode="612101",
