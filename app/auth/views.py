@@ -3,10 +3,9 @@
 from flask import render_template, request
 import json
 import user_dal
-
 from . import auth
-from app.utils.is_json import is_json
-from app.utils.post_json import post_json
+from utils.is_json import is_json
+from utils.post_json import post_json
 
 
 @auth.route('/login', methods=['GET', 'POST'])

@@ -1,7 +1,7 @@
 # _*_ coding:utf-8 _*_
 
-from app.model import user_model
-from app.utils import mysql_utils
+from model import user_model
+from utils import mysql_utils
 from . import hash
 
 
@@ -46,7 +46,6 @@ class UserDal:
     def register_name_check(cls, params):
         sql = "select * from 352dt_user_info where uname = %s "
         row = mysql_utils.Database().query_one(sql, (params['uname'],))
-        print(row)
         if row is not None:
             return False
         else:
