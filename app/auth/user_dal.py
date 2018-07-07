@@ -1,7 +1,7 @@
 # _*_ coding:utf-8 _*_
 
-from ..model import user_model
-from ..utils import mysql_utils
+from app.model import user_model
+from app.utils import mysql_utils
 from . import hash
 
 

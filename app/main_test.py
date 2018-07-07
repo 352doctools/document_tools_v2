@@ -4,7 +4,7 @@
 # python 2.7
 # Date: 2018/06/24
 # 352工具 服务器测试
-from app import create_app
+from __init__ import create_app
 
 if __name__ == '__main__':
     # 局域网访问调试
