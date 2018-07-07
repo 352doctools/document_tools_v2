@@ -34,9 +34,14 @@ class UserDal:
                 user_group = params['user_group']
             else:
                 user_group = '12345'
-            sql = "insert into 352dt_user_info (uid, uname, password, user_group, ctime, utime) " \
-                  "values (UUID(), %s, %s, %s, now(), now())"
-            mysql_utils.Database().insert_del_update(sql, (params['uname'], password, user_group))
+            if 'phone' in params.keys():
+                phone = params['phone']
+            else:
+                phone = None
+            sql = "insert into 352dt_user_info (uid, uname, password, user_group, nickname, mail, phone, ctime, utime) " \
+                  "values (UUID(), %s, %s, %s, %s, %s, %s, now(), now())"
+            mysql_utils.Database().insert_del_update(sql, (params['uname'], password, user_group, params['nickname'],
+                                                           params['mail'], phone,))
             return True
         else:
             return False

@@ -58,7 +58,8 @@ def register():
     elif request.method == 'POST':
         if is_json(request.get_data()):
             data = json.loads(request.get_data())
-            if 'uname' in data.keys() and 'password' in data.keys():
+            if 'uname' in data.keys() and 'password' in data.keys() and 'nickname' in data.keys() \
+                    and 'mail' in data.keys():
                 success = user_dal.UserDal().register(data)
             else:
                 return '输入参数不完整或者不正确'
