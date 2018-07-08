@@ -25,11 +25,13 @@ def create_app():
 
     from auth import auth as auth_blueprint
     from main import main as main_blueprint
+    from doc import doc as doc_blueprint
     from other import other as other_blueprint
 
     app.register_blueprint(auth_blueprint)
     # app.register_blueprint(auth_blueprint, url_prefix='/auth')
     app.register_blueprint(main_blueprint)
+    app.register_blueprint(doc_blueprint)
     app.register_blueprint(other_blueprint)
 
     return app

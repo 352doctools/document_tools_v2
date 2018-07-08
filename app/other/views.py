@@ -5,52 +5,6 @@ import json
 from . import other
 
 
-@other.route('/doc_list', methods=['GET', 'POST'])
-def doc_list():
-    message = (
-        dict(
-            code=0,
-            msg='sucess',
-            data=dict(
-                docinfo=[
-                    dict(
-                        docid=12301,
-                        docname="说明书1",
-                        doctype="ipo",
-                        docctime="2018-06-18 17:00:05",
-                        docutime="2018-06-18 17:00:05",
-                        docstate="3/13",
-                    ),
-                    dict(
-                        docid=12302,
-                        docname="说明书2",
-                        doctype="ipo",
-                        docctime="2018-06-18 17:00:05",
-                        docutime="2018-06-18 17:00:05",
-                        docstate="12/13",
-                    ),
-                ],
-            ),
-        ),
-        dict(
-            code=1,
-            msg='error',
-            data=u'获取数据出错',
-        ),
-    )
-
-    if request.method == 'GET':
-        return '<h1>请使用post方法</h1>'
-    elif request.method == 'POST':
-        data = json.loads(request.get_data())
-        if data["uid"] == '000':
-            return json.dumps(message[0], ensure_ascii=False)
-        else:
-            return json.dumps(message[1], ensure_ascii=False)
-    else:
-        return render_template('404.html')
-
-
 @other.route('/doc_chapter', methods=['GET', 'POST'])
 def doc_chapter():
     message = (
