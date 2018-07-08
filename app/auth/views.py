@@ -15,7 +15,7 @@ def login():
         elif request.method == 'POST':
             if is_json(request.get_data()):
                 data = json.loads(request.get_data())
-                if 'uname' in data.keys() and 'password' in data.keys():
+                if 'uname' in data.keys() and 'passwd' in data.keys():
                     user = user_dal.UserDal().login_auth(data)
                 else:
                     return '输入参数不完整或者不正确'
@@ -58,7 +58,7 @@ def register():
     elif request.method == 'POST':
         if is_json(request.get_data()):
             data = json.loads(request.get_data())
-            if 'uname' in data.keys() and 'password' in data.keys() and 'nickname' in data.keys() \
+            if 'uname' in data.keys() and 'passwd' in data.keys() and 'nickname' in data.keys() \
                     and 'mail' in data.keys():
                 success = user_dal.UserDal().register(data)
             else:

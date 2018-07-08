@@ -13,10 +13,10 @@ class UserDal:
     # 通过用户名及密码查询用户对象
     @classmethod
     def login_auth(cls, params):
-        password = hash.salted_password(params['password'])
+        passwd = hash.salted_password(params['passwd'])
 
-        sql = "select * from 352dt_user_info where uname = %s and password = %s"
-        row = mysql_utils.Database().query_one(sql, (params['uname'], password))
+        sql = "select * from 352dt_user_info where uname = %s and passwd = %s"
+        row = mysql_utils.Database().query_one(sql, (params['uname'], passwd))
         if row is not None:
             user = user_model.User(uid=row[1], uname=row[2], usergroup=row[4], nickname=row[5],
                                    mail=row[6], phone=row[7])
@@ -30,7 +30,7 @@ class UserDal:
     @classmethod
     def register(cls, params):
         if cls.register_name_check(params):
-            password = hash.salted_password(params['password'])
+            passwd = hash.salted_password(params['passwd'])
             if 'user_group' in params.keys():
                 user_group = params['user_group']
             else:
@@ -39,9 +39,9 @@ class UserDal:
                 phone = params['phone']
             else:
                 phone = None
-            sql = "insert into 352dt_user_info (uid, uname, password, user_group, nickname, mail, phone, ctime, utime) " \
+            sql = "insert into 352dt_user_info (uid, uname, passwd, user_group, nickname, mail, phone, ctime, utime) " \
                   "values (UUID(), %s, %s, %s, %s, %s, %s, now(), now())"
-            mysql_utils.Database().insert_del_update(sql, (params['uname'], password, user_group, params['nickname'],
+            mysql_utils.Database().insert_del_update(sql, (params['uname'], passwd, user_group, params['nickname'],
                                                            params['mail'], phone,))
             return True
         else:
