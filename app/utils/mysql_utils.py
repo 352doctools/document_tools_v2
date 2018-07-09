@@ -78,6 +78,16 @@ class Database:
             print err
             self.connection.rollback()
 
+    def insert_del_update_query_one(self, query1, query2, params1=(), params2=()):
+        try:
+            self.cursor.execute(query1, params1)
+            self.cursor.execute(query2, params2)
+            self.connection.commit()
+        except Exception, err:
+            print err
+            self.connection.rollback()
+        return self.cursor.fetchone()
+
     def query_one(self, query, params=()):
         try:
             self.cursor.execute(query, params)
