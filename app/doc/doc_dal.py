@@ -37,7 +37,7 @@ class DocDal:
                 doc = doc_model.Doc(docid=row[1], docname=row[2], doctype=row[3],
                                     docctime=row[6].strftime("%Y-%m-%d %H:%M:%S"),
                                     docutime=row[7].strftime("%Y-%m-%d %H:%M:%S"),
-                                    docstate=None)
+                                    docstate="3/13")
                 doc_list.append(doc.to_dict())
             return doc_list
         else:
