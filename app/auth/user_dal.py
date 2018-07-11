@@ -54,9 +54,10 @@ class UserDal:
                 phone = None
             sql = "insert into 352dt_user_info (uid, uname, passwd, user_group, nickname, mail, phone, ctime, utime) " \
                   "values (UUID(), %s, %s, %s, %s, %s, %s, now(), now())"
-            mysql_utils.Database().insert_del_update(sql, (params['uname'], passwd, user_group, params['nickname'],
+            rowcount = mysql_utils.Database().insert_del_update(sql, (params['uname'], passwd, user_group, params['nickname'],
                                                            params['mail'], phone,))
-            return True
+            if rowcount > 0:
+                return True
         else:
             return False
 
