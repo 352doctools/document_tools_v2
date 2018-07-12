@@ -20,8 +20,8 @@ login_manager.login_view = 'auth.login'
 def create_app():
     app = Flask(__name__)
     # 解决跨域问题
-    CORS(app, resources={r"/*": {"origins": "*"}}, send_wildcard=True)
-    # CORS(app, supports_credentials=True)
+    # CORS(app, resources={r"/*": {"origins": "*"}}, send_wildcard=True)
+    CORS(app, supports_credentials=True)
     bootstrap.init_app(app)
     login_manager.init_app(app)
 
