@@ -68,12 +68,14 @@ class Database:
             self.connection = mysql.connector.connect(**config)
         except Exception, err:
             print(err)
-        self.cursor = self.connection.cursor(buffered=True)
+        self.cursor = self.connection.cursor(buffered=True, dictionary=True)
 
     def insert_del_update(self, query, params=()):
         try:
             self.cursor.execute(query, params)
+            row_count = self.cursor.rowcount
             self.connection.commit()
+            return row_count
         except Exception, err:
             print err
             self.connection.rollback()
