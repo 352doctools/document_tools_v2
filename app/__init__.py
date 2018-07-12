@@ -8,7 +8,7 @@
 
 from flask_bootstrap import Bootstrap
 from flask import Flask
-from flask_cors import *
+from flask_cors import CORS
 from flask_login import LoginManager
 
 bootstrap = Bootstrap()
@@ -19,6 +19,8 @@ login_manager.login_view = 'auth.login'
 
 def create_app():
     app = Flask(__name__)
+    # 解决跨域问题
+    # CORS(app, resources={r"/*": {"origins": "*"}}, send_wildcard=True)
     CORS(app, supports_credentials=True)
     bootstrap.init_app(app)
     login_manager.init_app(app)
