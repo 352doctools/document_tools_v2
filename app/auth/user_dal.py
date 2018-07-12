@@ -14,7 +14,6 @@ class UserDal:
     def check_uid(cls, params):
         sql = "select * from 352dt_user_info where uid = %s"
         row = mysql_utils.Database().query_one(sql, (params['uid'],))
-        print(row)
         if row is not None:
             user = user_model.User(uid=row['uid'], uname=row['uname'], usergroup=row['user_group'],
                                    nickname=row['nickname'], mail=row['mail'], phone=row['phone'])

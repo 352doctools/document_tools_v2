@@ -84,7 +84,7 @@ def doc_create1():
                 if UserDal.check_uid(data) is not None:
                     new_doc = doc_dal.DocDal().insert_doc_and_get_doc(data)
                     if new_doc is not None:
-                        doc_id = new_doc[1]
+                        doc_id = new_doc['doc_id']
                 else:
                     return "用户校验出错"
             else:
