@@ -16,9 +16,9 @@ class DocDal:
         sql = "select * from 352dt_doc_info where doc_id = %s and doc_state = 1"
         row = mysql_utils.Database().query_one(sql, (params['docid'],))
         if row is not None:
-            doc = doc_model.Doc(docid=row[1], doctype=row[3], docname=row[4],
-                                docctime=row[7].strftime("%Y-%m-%d %H:%M:%S"),
-                                docutime=row[8].strftime("%Y-%m-%d %H:%M:%S"),
+            doc = doc_model.Doc(docid=row['doc_id'], doctype=row['doc_type'], docname=row['doc_name'],
+                                docctime=row['ctime'].strftime("%Y-%m-%d %H:%M:%S"),
+                                docutime=row['utime'].strftime("%Y-%m-%d %H:%M:%S"),
                                 docstate="3/13")
             # 实例化一个对象，将查询结果添加给对象的属性
         else:
@@ -33,9 +33,9 @@ class DocDal:
         if len(rows) > 0:
             doc_list = []
             for row in rows:
-                doc = doc_model.Doc(docid=row[1], doctype=row[3], docname=row[4],
-                                    docctime=row[7].strftime("%Y-%m-%d %H:%M:%S"),
-                                    docutime=row[8].strftime("%Y-%m-%d %H:%M:%S"),
+                doc = doc_model.Doc(docid=row['doc_id'], doctype=row['doc_type'], docname=row['doc_name'],
+                                    docctime=row['ctime'].strftime("%Y-%m-%d %H:%M:%S"),
+                                    docutime=row['utime'].strftime("%Y-%m-%d %H:%M:%S"),
                                     docstate="3/13")
                 doc_list.append(doc.to_dict())
             return doc_list
@@ -44,7 +44,7 @@ class DocDal:
 
     @classmethod
     def get_doc_dict(cls, dict_class):
-        sql = "select * from 352dt_base_dict where dict_class = %s and doc_state = 1 order by dict_class"
+        sql = "select * from 352dt_base_dict where dict_class = %s order by dict_class"
         rows = mysql_utils.Database().query_all(sql, (dict_class,))
         return rows
 
@@ -54,7 +54,7 @@ class DocDal:
         if len(rows) > 0:
             doc_type_list = []
             for row in rows:
-                doc_type = dict(doctype=row[3], doctypename=row[4])
+                doc_type = dict(doctype=row['dict_name'], doctypename=row['dict_text'])
                 doc_type_list.append(doc_type)
             return doc_type_list
         else:
@@ -90,7 +90,8 @@ class DocDal:
         if len(rows) > 0:
             doc_chapter_list = []
             for row in rows:
-                doc_chapter = dict(cptitle=row[5], cpcode=row[2], level=row[3], next=row[4])
+                doc_chapter = dict(cptitle=row['cptitle'], cpcode=row['cpcode'], level=row['cplevel'],
+                                   next=row['cpnext'])
                 doc_chapter_list.append(doc_chapter)
             return [doc_dict, doc_chapter_list]
 

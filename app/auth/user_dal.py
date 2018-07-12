@@ -14,14 +14,14 @@ class UserDal:
     def check_uid(cls, params):
         sql = "select * from 352dt_user_info where uid = %s"
         row = mysql_utils.Database().query_one(sql, (params['uid'],))
+        print(row)
         if row is not None:
-            user = user_model.User(uid=row[1], uname=row[2], usergroup=row[4], nickname=row[5],
-                                   mail=row[6], phone=row[7])
+            user = user_model.User(uid=row['uid'], uname=row['uname'], usergroup=row['user_group'],
+                                   nickname=row['nickname'], mail=row['mail'], phone=row['phone'])
             # 实例化一个对象，将查询结果逐一添加给对象的属性
         else:
             return None
         return user
-
 
     # 通过用户名及密码查询用户对象
     @classmethod
@@ -31,8 +31,8 @@ class UserDal:
         sql = "select * from 352dt_user_info where uname = %s and passwd = %s"
         row = mysql_utils.Database().query_one(sql, (params['uname'], passwd))
         if row is not None:
-            user = user_model.User(uid=row[1], uname=row[2], usergroup=row[4], nickname=row[5],
-                                   mail=row[6], phone=row[7])
+            user = user_model.User(uid=row['uid'], uname=row['uname'], usergroup=row['user_group'],
+                                   nickname=row['nickname'], mail=row['mail'], phone=row['phone'])
             # 实例化一个对象，将查询结果逐一添加给对象的属性
         else:
             return None
