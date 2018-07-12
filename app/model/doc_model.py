@@ -2,7 +2,7 @@
 
 
 class Doc:
-    def __init__(self, docid=None, docname=None, doctype=None, docctime=None, docutime=None, docstate=None):
+    def __init__(self, docid=None, doctype=None, docname=None, docctime=None, docutime=None, docstate=None):
         self.docid = docid
         self.docname = docname
         self.doctype = doctype
