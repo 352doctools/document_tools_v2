@@ -153,3 +153,27 @@ def doc_chapter():
             return '输入参数不完整或者不正确'
     else:
         return render_template('404.html')
+
+
+@doc.route('/doc_cl_check', methods=['GET', 'POST'])
+def get_doc_cl_check():
+    if request.method == 'GET':
+        return '<h1>请使用post方法</h1>'
+    elif request.method == 'POST':
+        if is_json(request.get_data()):
+            data = json.loads(request.get_data())
+            if 'uid' in data.keys() and 'docid' in data.keys() and 'doc_type_cpcode' in data.keys():
+                if UserDal.check_uid(data) is not None:
+                    doc_cl_check = doc_dal.DocDal().get_doc_cl_check(data)
+                    if doc_cl_check is not None:
+                        return post_json(0, 'success', data=doc_cl_check)
+                    else:
+                        return post_json(data='章节模块查询出错')
+                else:
+                    return "用户校验出错"
+            else:
+                return '输入参数不完整或者不正确'
+        else:
+            return '输入参数不完整或者不正确'
+    else:
+        return render_template('404.html')

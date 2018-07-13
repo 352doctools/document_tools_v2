@@ -3,6 +3,7 @@
 from model import doc_model
 from utils import mysql_utils
 import uuid
+import re
 
 
 class DocDal:
@@ -96,3 +97,167 @@ class DocDal:
             return [doc_dict, doc_chapter_list]
 
         return [doc_dict, None]
+
+    @classmethod
+    def get_doc_base_content(cls, params):
+        sql = "select * from 352dt_doc_base_content where doc_type_cpcode = %s"
+        row = mysql_utils.Database().query_one(sql, (params['doc_type_cpcode'],))
+        if row is not None:
+            doc_base_content = dict(cpcode=row['cpcode'], bcontent=row['bcontent'], change="0")
+            return doc_base_content
+        return row
+
+    @classmethod
+    def get_doc_content(cls, params):
+        sql = "select * from 352dt_doc_content where docid = %s and doc_type_cpcode = %s"
+        row = mysql_utils.Database().query_one(sql, (params['docid'], params['doc_type_cpcode'],))
+        if row is not None:
+            doc_content = dict(cpcode=row['cpcode'], bcontent=row['bcontent'], change="1")
+            return doc_content
+        return row
+
+    @classmethod
+    def get_replace_label_dict(cls, params):
+        sql = "select * from 352dt_replace_label_dict where doc_type_cpcode = %s " \
+              "and rlsymbol = %s "
+        row = mysql_utils.Database().query_one(sql, (params['doc_type_cpcode'], params['rlsymbol']))
+        if row is not None:
+            replace_label_dict = dict(rlcode=row['rlcode'], rlname=row['rlcontent'],
+                                      rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], change="0")
+            return replace_label_dict
+        return row
+
+    @classmethod
+    def get_replace_label_content(cls, params):
+        sql = "select * from 352dt_replace_label_content where doc_type_cpcode = %s " \
+              "and docid = %s and rlsymbol = %s "
+        row = mysql_utils.Database().query_one(sql, (params['doc_type_cpcode'], params['docid'], params['rlsymbol']))
+        if row is not None:
+            replace_label_content = dict(rlcode=row['rlcode'], rlname=row['rlcontent'],
+                                         rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], change="1")
+            return replace_label_content
+        return row
+
+    @classmethod
+    def get_template_dict(cls, params):
+        sql = "select * from 352dt_template_dict where doc_type_cpcode = %s and tmsymbol = %s "
+        row = mysql_utils.Database().query_one(sql, (params['doc_type_cpcode'], params['tmsymbol'], ))
+        if row is not None:
+            template_dict = dict(tmcode=row['tmcode'], tmtype=row['tmtype'], tmpalcename=row['tmplacename'],
+                                 tmnote=row['tmnote'], tmcontent=row['tmplacename'], change="0")
+            return template_dict
+        return row
+
+    @classmethod
+    def get_template_recommend_content_type(cls, params):
+        sql = "select distinct tminputcode, tminputtext from 352dt_template_recommend_content " \
+              "where doc_type_cpcode = %s and tmcode = %s "
+        rows = mysql_utils.Database().query_all(sql, (params['doc_type_cpcode'], params['tmcode'], ))
+        if len(rows) > 0:
+            return rows
+        return None
+
+    @classmethod
+    def get_template_content(cls, params):
+        sql = "select * from 352dt_template_content where doc_type_cpcode = %s and docid = %s and tmsymbol = %s "
+        row = mysql_utils.Database().query_one(sql, (params['doc_type_cpcode'], params['docid'], params['tmsymbol'],))
+        if row is not None:
+            template_content = dict(tmcode=row['tmcode'], tmtype=row['tmtype'], tmpalcename=row['tmplacename'],
+                                    tmnote=row['tmnote'], tmcontent=row['tmcontent'], change="1")
+            return template_content
+        return row
+
+    @classmethod
+    def get_num_label_dict(cls, params):
+        sql = "select * from 352dt_num_label_dict where doc_type_cpcode = %s and nlsymbol = %s "
+        row = mysql_utils.Database().query_one(sql, (params['doc_type_cpcode'], params['nlsymbol'], ))
+        if row is not None:
+            num_label_dict = dict(nlcode=row['nlcode'], nltype=row['nltype'],
+                                  nlcontent=row['nlcontent'], nlnote=row['nlnote'], changer="0")
+            return num_label_dict
+        return row
+
+    @classmethod
+    def get_num_label_content(cls, params):
+        sql = "select * from 352dt_num_label_content where doc_type_cpcode = %s and docid = %s and nlsymbol = %s "
+        row = mysql_utils.Database().query_one(sql, (params['doc_type_cpcode'], params['docid'], params['nlsymbol'], ))
+        if row is not None:
+            num_label_content = dict(nlcode=row['nlcode'], nltype=row['nltype'],
+                                     nlcontent=row['nlcontent'], nlnote=row['nlnote'], changer="1")
+            return num_label_content
+        return row
+
+    @classmethod
+    def get_doc_cl_check(cls, params):
+        doc_cl_check = cls.get_doc_content(params)
+        if doc_cl_check is None:
+            doc_cl_check = cls.get_doc_base_content(params)
+            if doc_cl_check is None:
+                return None
+        doc_cl_check['doc_type_cpcode'] = params['doc_type_cpcode']
+        doc_cl_check['docid'] = params['docid']
+        regxString = doc_cl_check['bcontent']
+        rlregx = re.compile("(\(\(str.*?\)\))")
+        rllist = re.findall(rlregx, regxString)
+        rllist = sorted(set(rllist), key=rllist.index)
+        tmregx = re.compile("(\[\[tm.*?\]\])")
+        tmlist = re.findall(tmregx, regxString)
+        tmlist = sorted(set(tmlist), key=tmlist.index)
+        nlregx = re.compile("(\(\(num.*?\)\))")
+        nllist = re.findall(nlregx, regxString)
+        nllist = sorted(set(nllist), key=nllist.index)
+        if len(rllist) > 0:
+            rllisttemp = []
+            for rl in rllist:
+                rl_result = cls.get_replace_label_content(dict(doc_type_cpcode=params['doc_type_cpcode'],
+                                                        docid=params['docid'], rlsymbol=rl,))
+                if rl_result is None:
+                    rl_result = cls.get_replace_label_dict(dict(doc_type_cpcode=params['doc_type_cpcode'], rlsymbol=rl,))
+                if rl_result is None:
+                    rl_result = dict(err="数字标签字典当前类型文档当前章节中没有 " + rl +" 标签")
+                rllisttemp.append(rl_result)
+            rllist = rllisttemp
+        else:
+            rllist = None
+
+        if len(tmlist) > 0:
+            tmlisttemp = []
+            for tm in tmlist:
+                tm_result = cls.get_template_content(dict(doc_type_cpcode=params['doc_type_cpcode'],
+                                                           docid=params['docid'], tmsymbol=tm, ))
+                if tm_result is None:
+                    tm_result = cls.get_template_dict(
+                        dict(doc_type_cpcode=params['doc_type_cpcode'], tmsymbol=tm, ))
+                if tm_result is None:
+                    tm_result = dict(err="数字标签字典当前类型文档当前章节中没有 " + tm + " 标签")
+                else:
+                    tminputlist = cls.get_template_recommend_content_type(
+                        dict(doc_type_cpcode=params['doc_type_cpcode'], tmcode=tm_result['tmcode'],))
+                    if tminputlist is not None:
+                        tm_result['tminputlist'] = tminputlist
+                    else:
+                        tm_result['tminputlist'] = dict(err="当前类型文档当前章节该模板标签无可选模板")
+                tmlisttemp.append(tm_result)
+            tmlist = tmlisttemp
+        else:
+            tmlist = None
+
+        if len(nllist) > 0:
+            nllisttemp = []
+            for nl in nllist:
+                nl_result = cls.get_num_label_content(dict(doc_type_cpcode=params['doc_type_cpcode'],
+                                                           docid=params['docid'], nlsymbol=nl, ))
+                if nl_result is None:
+                    nl_result = cls.get_num_label_dict(
+                        dict(doc_type_cpcode=params['doc_type_cpcode'], nlsymbol=nl, ))
+                if nl_result is None:
+                    nl_result = dict(err="数字标签字典当前类型文档当前章节中没有 " + nl +" 标签")
+                nllisttemp.append(nl_result)
+            nllist = nllisttemp
+        else:
+            nllist = None
+
+        doc_cl_check['rllist'] = rllist
+        doc_cl_check['tmlist'] = tmlist
+        doc_cl_check['nllist'] = nllist
+        return doc_cl_check
