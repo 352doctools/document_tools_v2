@@ -122,7 +122,7 @@ class DocDal:
               "and rlsymbol = %s "
         row = mysql_utils.Database().query_one(sql, (params['doc_type_cpcode'], params['rlsymbol']))
         if row is not None:
-            replace_label_dict = dict(rlcode=row['rlcode'], rlname=row['rlcontent'],
+            replace_label_dict = dict(rlcode=row['rlcode'], rlname=row['rlname'], rlcontent=row['rlcontent'],
                                       rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], change="0")
             return replace_label_dict
         return row
@@ -133,7 +133,7 @@ class DocDal:
               "and docid = %s and rlsymbol = %s "
         row = mysql_utils.Database().query_one(sql, (params['doc_type_cpcode'], params['docid'], params['rlsymbol']))
         if row is not None:
-            replace_label_content = dict(rlcode=row['rlcode'], rlname=row['rlcontent'],
+            replace_label_content = dict(rlcode=row['rlcode'], rlname=row['rlname'], rlcontent=row['rlcontent'],
                                          rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], change="1")
             return replace_label_content
         return row
@@ -143,8 +143,8 @@ class DocDal:
         sql = "select * from 352dt_template_dict where doc_type_cpcode = %s and tmsymbol = %s "
         row = mysql_utils.Database().query_one(sql, (params['doc_type_cpcode'], params['tmsymbol'], ))
         if row is not None:
-            template_dict = dict(tmcode=row['tmcode'], tmtype=row['tmtype'], tmpalcename=row['tmplacename'],
-                                 tmnote=row['tmnote'], tmcontent=row['tmplacename'], change="0")
+            template_dict = dict(tmcode=row['tmcode'], tmtype=row['tmtype'], tmname=row['tmname'],
+                                 tmsymbol=row['tmsymbol'], tmnote=row['tmnote'], tmcontent=row['tmcontent'], change="0")
             return template_dict
         return row
 
@@ -162,8 +162,9 @@ class DocDal:
         sql = "select * from 352dt_template_content where doc_type_cpcode = %s and docid = %s and tmsymbol = %s "
         row = mysql_utils.Database().query_one(sql, (params['doc_type_cpcode'], params['docid'], params['tmsymbol'],))
         if row is not None:
-            template_content = dict(tmcode=row['tmcode'], tmtype=row['tmtype'], tmpalcename=row['tmplacename'],
-                                    tmnote=row['tmnote'], tmcontent=row['tmcontent'], change="1")
+            template_content = dict(tmcode=row['tmcode'], tmtype=row['tmtype'], tmname=row['tmname'],
+                                    tmsymbol=row['tmsymbol'], tmnote=row['tmnote'],
+                                    tmcontent=row['tmcontent'], change="1")
             return template_content
         return row
 
@@ -172,8 +173,9 @@ class DocDal:
         sql = "select * from 352dt_num_label_dict where doc_type_cpcode = %s and nlsymbol = %s "
         row = mysql_utils.Database().query_one(sql, (params['doc_type_cpcode'], params['nlsymbol'], ))
         if row is not None:
-            num_label_dict = dict(nlcode=row['nlcode'], nltype=row['nltype'],
-                                  nlcontent=row['nlcontent'], nlnote=row['nlnote'], changer="0")
+            num_label_dict = dict(nlcode=row['nlcode'], nltype=row['nltype'], nlname=row['nlname'],
+                                  nlsymbol=row['nlsymbol'], nlcontent=row['nlcontent'],
+                                  nlnote=row['nlnote'], changer="0")
             return num_label_dict
         return row
 
@@ -182,8 +184,9 @@ class DocDal:
         sql = "select * from 352dt_num_label_content where doc_type_cpcode = %s and docid = %s and nlsymbol = %s "
         row = mysql_utils.Database().query_one(sql, (params['doc_type_cpcode'], params['docid'], params['nlsymbol'], ))
         if row is not None:
-            num_label_content = dict(nlcode=row['nlcode'], nltype=row['nltype'],
-                                     nlcontent=row['nlcontent'], nlnote=row['nlnote'], changer="1")
+            num_label_content = dict(nlcode=row['nlcode'], nltype=row['nltype'], nlname=row['nlname'],
+                                     nlsymbol=row['nlsymbol'], nlcontent=row['nlcontent'],
+                                     nlnote=row['nlnote'], changer="1")
             return num_label_content
         return row
 
