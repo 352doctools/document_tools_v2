@@ -5,6 +5,7 @@ from utils import mysql_utils
 import uuid
 import re
 import decimal
+import time
 
 
 class DocDal:
@@ -301,3 +302,14 @@ class DocDal:
         else:
             return None
 
+    @classmethod
+    def doc_check_t(cls, params):
+        sql = "select tminputcode, tmcontentcode, tmcontent, ctime, tmsource " \
+              "from 352dt_template_recommend_content where cpcode = %s and tmcode = %s and tminputcode = %s"
+        rows = mysql_utils.Database().query_all(sql, (params['cpcode'], params['tmcode'], params['tminputcode'],))
+        if len(rows) > 0:
+            for row in rows:
+                row['tmctime'] = row.pop('ctime').strftime('%Y-%m-%d %H:%M:%S')
+            return rows
+        else:
+            return None

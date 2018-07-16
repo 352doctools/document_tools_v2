@@ -202,3 +202,28 @@ def calc_nl_value():
             return '输入参数不完整或者不正确'
     else:
         return render_template('404.html')
+
+
+@doc.route('/doc_check_t', methods=['GET', 'POST'])
+def doc_check_t():
+    if request.method == 'GET':
+        return '<h1>请使用post方法</h1>'
+    elif request.method == 'POST':
+        if is_json(request.get_data()):
+            data = json.loads(request.get_data())
+            if 'uid' in data.keys() and 'docid' in data.keys() and 'cpcode' in data.keys() \
+                    and 'tmcode' in data.keys() and 'tminputcode' in data.keys():
+                if UserDal.check_uid(data) is not None:
+                    tcontentlist = doc_dal.DocDal().doc_check_t(data)
+                    if doc_check_t is not None:
+                        return post_json(0, 'success', data=tcontentlist)
+                    else:
+                        return post_json(data='模板查询出错')
+                else:
+                    return "用户校验出错"
+            else:
+                return '输入参数不完整或者不正确'
+        else:
+            return '输入参数不完整或者不正确'
+    else:
+        return render_template('404.html')
