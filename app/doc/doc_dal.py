@@ -286,6 +286,7 @@ class DocDal:
         formulas = cls.get_formula(params)
         if formulas is None:
             return None
+        llist = []
         for key in formulas.keys():
             for item in params['llist']:
                 if 'lsymbol' in item.keys() and 'lcontent' in item.keys():
@@ -293,6 +294,10 @@ class DocDal:
                 else:
                     return None
             calc = eval(formulas[key])
-            formulas[key] = decimal.Decimal(calc).quantize(decimal.Decimal('0.00'))
-        return formulas
+            formulas[key] = str(decimal.Decimal(calc).quantize(decimal.Decimal('0.00')))
+            llist.append(dict(lsymbol=key, lvalue=formulas[key]))
+        if len(llist) > 0:
+            return llist
+        else:
+            return None
 
