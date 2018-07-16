@@ -105,7 +105,7 @@ class DocDal:
         sql = "select * from 352dt_doc_base_content where cpcode = %s"
         row = mysql_utils.Database().query_one(sql, (params['cpcode'],))
         if row is not None:
-            doc_base_content = dict(cpcode=row['cpcode'], bcontent=row['bcontent'], change="0")
+            doc_base_content = dict(cpcode=row['cpcode'], bcontent=row['bcontent'], cp_change="0")
             return doc_base_content
         return row
 
@@ -114,7 +114,7 @@ class DocDal:
         sql = "select * from 352dt_doc_content where docid = %s and cpcode = %s"
         row = mysql_utils.Database().query_one(sql, (params['docid'], params['cpcode'],))
         if row is not None:
-            doc_content = dict(cpcode=row['cpcode'], bcontent=row['bcontent'], change="1")
+            doc_content = dict(cpcode=row['cpcode'], bcontent=row['bcontent'], cp_change="1")
             return doc_content
         return row
 
@@ -125,7 +125,7 @@ class DocDal:
         row = mysql_utils.Database().query_one(sql, (params['cpcode'], params['rlsymbol']))
         if row is not None:
             replace_label_dict = dict(rlcode=row['rlcode'], rlname=row['rlname'], rlcontent=row['rlcontent'],
-                                      rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], change="0")
+                                      rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], rl_change="0")
             return replace_label_dict
         return row
 
@@ -136,7 +136,7 @@ class DocDal:
         row = mysql_utils.Database().query_one(sql, (params['cpcode'], params['docid'], params['rlsymbol']))
         if row is not None:
             replace_label_content = dict(rlcode=row['rlcode'], rlname=row['rlname'], rlcontent=row['rlcontent'],
-                                         rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], change="1")
+                                         rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], rl_change="1")
             return replace_label_content
         return row
 
@@ -146,7 +146,7 @@ class DocDal:
         row = mysql_utils.Database().query_one(sql, (params['cpcode'], params['tmsymbol'], ))
         if row is not None:
             template_dict = dict(tmcode=row['tmcode'], tmtype=row['tmtype'], tmname=row['tmname'],
-                                 tmsymbol=row['tmsymbol'], tmnote=row['tmnote'], tmcontent=row['tmcontent'], change="0")
+                                 tmsymbol=row['tmsymbol'], tmnote=row['tmnote'], tmcontent=row['tmcontent'], tm_change="0")
             return template_dict
         return row
 
@@ -166,7 +166,7 @@ class DocDal:
         if row is not None:
             template_content = dict(tmcode=row['tmcode'], tmtype=row['tmtype'], tmname=row['tmname'],
                                     tmsymbol=row['tmsymbol'], tmnote=row['tmnote'],
-                                    tmcontent=row['tmcontent'], change="1")
+                                    tmcontent=row['tmcontent'], tm_change="1")
             return template_content
         return row
 
@@ -177,7 +177,7 @@ class DocDal:
         if row is not None:
             num_label_dict = dict(nlcode=row['nlcode'], nltype=row['nltype'], nlname=row['nlname'],
                                   nlsymbol=row['nlsymbol'], nlcontent=row['nlcontent'],
-                                  nlnote=row['nlnote'], changer="0")
+                                  nlnote=row['nlnote'], nl_change="0")
             return num_label_dict
         return row
 
@@ -188,7 +188,7 @@ class DocDal:
         if row is not None:
             num_label_content = dict(nlcode=row['nlcode'], nltype=row['nltype'], nlname=row['nlname'],
                                      nlsymbol=row['nlsymbol'], nlcontent=row['nlcontent'],
-                                     nlnote=row['nlnote'], changer="1")
+                                     nlnote=row['nlnote'], nl_change="1")
             return num_label_content
         return row
 
@@ -199,7 +199,6 @@ class DocDal:
             doc_cl_check = cls.get_doc_base_content(params)
             if doc_cl_check is None:
                 return None
-        doc_cl_check['cpcode'] = params['cpcode']
         doc_cl_check['docid'] = params['docid']
         regxString = doc_cl_check['bcontent']
         rlregx = re.compile("(\(\(str.*?\)\))")
