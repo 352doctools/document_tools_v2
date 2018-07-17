@@ -88,7 +88,7 @@ class DocDal:
         if doc_dict is None:
             return None
         sql = "select * from 352dt_doc_base_content " \
-              "where doc_type = %s"
+              "where doctype = %s"
         rows = mysql_utils.Database().query_all(sql, (doc_dict['doctype'],))
         if len(rows) > 0:
             doc_chapter_list = []
@@ -105,7 +105,7 @@ class DocDal:
         sql = "select * from 352dt_doc_base_content where cpcode = %s"
         row = mysql_utils.Database().query_one(sql, (params['cpcode'],))
         if row is not None:
-            doc_base_content = dict(cpcode=row['cpcode'], bcontent=row['bcontent'], cp_change="0")
+            doc_base_content = dict(cpcode=row['cpcode'], bcontent=row['bcontent'], cpchange="0")
             return doc_base_content
         return row
 
@@ -114,7 +114,7 @@ class DocDal:
         sql = "select * from 352dt_doc_content where docid = %s and cpcode = %s"
         row = mysql_utils.Database().query_one(sql, (params['docid'], params['cpcode'],))
         if row is not None:
-            doc_content = dict(cpcode=row['cpcode'], bcontent=row['bcontent'], cp_change="1")
+            doc_content = dict(cpcode=row['cpcode'], bcontent=row['bcontent'], cpchange="1")
             return doc_content
         return row
 
@@ -125,7 +125,7 @@ class DocDal:
         row = mysql_utils.Database().query_one(sql, (params['cpcode'], params['rlsymbol']))
         if row is not None:
             replace_label_dict = dict(rlcode=row['rlcode'], rlname=row['rlname'], rlcontent=row['rlcontent'],
-                                      rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], rl_change="0")
+                                      rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], rlchange="0")
             return replace_label_dict
         return row
 
@@ -136,7 +136,7 @@ class DocDal:
         row = mysql_utils.Database().query_one(sql, (params['cpcode'], params['docid'], params['rlsymbol']))
         if row is not None:
             replace_label_content = dict(rlcode=row['rlcode'], rlname=row['rlname'], rlcontent=row['rlcontent'],
-                                         rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], rl_change="1")
+                                         rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], rlchange="1")
             return replace_label_content
         return row
 
@@ -146,7 +146,7 @@ class DocDal:
         row = mysql_utils.Database().query_one(sql, (params['cpcode'], params['tmsymbol'], ))
         if row is not None:
             template_dict = dict(tmcode=row['tmcode'], tmtype=row['tmtype'], tmname=row['tmname'],
-                                 tmsymbol=row['tmsymbol'], tmnote=row['tmnote'], tmcontent=row['tmcontent'], tm_change="0")
+                                 tmsymbol=row['tmsymbol'], tmnote=row['tmnote'], tmcontent=row['tmcontent'], tmchange="0")
             return template_dict
         return row
 
@@ -166,7 +166,7 @@ class DocDal:
         if row is not None:
             template_content = dict(tmcode=row['tmcode'], tmtype=row['tmtype'], tmname=row['tmname'],
                                     tmsymbol=row['tmsymbol'], tmnote=row['tmnote'],
-                                    tmcontent=row['tmcontent'], tm_change="1")
+                                    tmcontent=row['tmcontent'], tmchange="1")
             return template_content
         return row
 
@@ -177,7 +177,7 @@ class DocDal:
         if row is not None:
             num_label_dict = dict(nlcode=row['nlcode'], nltype=row['nltype'], nlname=row['nlname'],
                                   nlsymbol=row['nlsymbol'], nlcontent=row['nlcontent'],
-                                  nlnote=row['nlnote'], nl_change="0")
+                                  nlnote=row['nlnote'], nlchange="0")
             return num_label_dict
         return row
 
@@ -188,7 +188,7 @@ class DocDal:
         if row is not None:
             num_label_content = dict(nlcode=row['nlcode'], nltype=row['nltype'], nlname=row['nlname'],
                                      nlsymbol=row['nlsymbol'], nlcontent=row['nlcontent'],
-                                     nlnote=row['nlnote'], nl_change="1")
+                                     nlnote=row['nlnote'], nlchange="1")
             return num_label_content
         return row
 
