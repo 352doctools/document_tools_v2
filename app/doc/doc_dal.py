@@ -269,12 +269,14 @@ class DocDal:
     def get_formula(cls, params):
         # 通过params里面的'cpcode'得到所有公式formulas
         sql = "select * from 352dt_num_label_dict " \
-              "where cpcode = %s and nltype = 'output' "
-        rows = mysql_utils.Database().query_all(sql, (params['cpcode'],))
+              "where doctype = %s and nltype = 'output' "
+        params['doctype'] = params['cpcode'].split('-')[0]
+        rows = mysql_utils.Database().query_all(sql, (params['doctype'],))
         if len(rows) > 0:
-            formulas = {}
+            formulas = []
             for row in rows:
-                formulas[row['nlsymbol']] = row['nlcontent']
+                formula = dict(lcode=row["nlcode"], lsymbol=row['nlsymbol'], lcontent=row['nlcontent'])
+                formulas.append(formula)
             return formulas
         else:
             return None
@@ -284,20 +286,15 @@ class DocDal:
         formulas = cls.get_formula(params)
         if formulas is None:
             return None
-        llist = []
-        for key in formulas.keys():
+        for formula in formulas:
             for item in params['llist']:
                 if 'lsymbol' in item.keys() and 'lcontent' in item.keys():
-                    formulas[key] = formulas[key].replace(item['lsymbol'], item['lcontent'])
+                    formula['lcontent'] = formula['lcontent'].replace(item['lsymbol'], item['lcontent'])
                 else:
                     return None
-            calc = eval(formulas[key])
-            formulas[key] = str(decimal.Decimal(calc).quantize(decimal.Decimal('0.00')))
-            llist.append(dict(lsymbol=key, lvalue=formulas[key]))
-        if len(llist) > 0:
-            return llist
-        else:
-            return None
+            calc = eval(formula['lcontent'])
+            formula['lcontent'] = str(decimal.Decimal(calc).quantize(decimal.Decimal('0.00')))
+        return formulas
 
     @classmethod
     def doc_check_t(cls, params):
