@@ -120,9 +120,9 @@ class DocDal:
 
     @classmethod
     def get_replace_label_dict(cls, params):
-        sql = "select * from 352dt_replace_label_dict where cpcode = %s " \
-              "and rlsymbol = %s "
-        row = mysql_utils.Database().query_one(sql, (params['cpcode'], params['rlsymbol']))
+        sql = "select * from 352dt_replace_label_dict where doctype = %s and rlsymbol = %s "
+        params['doctype'] = params['cpcode'].split('-')[0]
+        row = mysql_utils.Database().query_one(sql, (params['doctype'], params['rlsymbol']))
         if row is not None:
             replace_label_dict = dict(rlcode=row['rlcode'], rlname=row['rlname'], rlcontent=row['rlcontent'],
                                       rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], rlchange="0")
@@ -131,9 +131,8 @@ class DocDal:
 
     @classmethod
     def get_replace_label_content(cls, params):
-        sql = "select * from 352dt_replace_label_content where cpcode = %s " \
-              "and docid = %s and rlsymbol = %s "
-        row = mysql_utils.Database().query_one(sql, (params['cpcode'], params['docid'], params['rlsymbol']))
+        sql = "select * from 352dt_replace_label_content where docid = %s and rlsymbol = %s "
+        row = mysql_utils.Database().query_one(sql, (params['docid'], params['rlsymbol']))
         if row is not None:
             replace_label_content = dict(rlcode=row['rlcode'], rlname=row['rlname'], rlcontent=row['rlcontent'],
                                          rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], rlchange="1")
@@ -142,8 +141,9 @@ class DocDal:
 
     @classmethod
     def get_template_dict(cls, params):
-        sql = "select * from 352dt_template_dict where cpcode = %s and tmsymbol = %s "
-        row = mysql_utils.Database().query_one(sql, (params['cpcode'], params['tmsymbol'], ))
+        sql = "select * from 352dt_template_dict where doctype = %s and tmsymbol = %s "
+        params['doctype'] = params['cpcode'].split('-')[0]
+        row = mysql_utils.Database().query_one(sql, (params['doctype'], params['tmsymbol'], ))
         if row is not None:
             template_dict = dict(tmcode=row['tmcode'], tmtype=row['tmtype'], tmname=row['tmname'],
                                  tmsymbol=row['tmsymbol'], tmnote=row['tmnote'], tmcontent=row['tmcontent'], tmchange="0")
@@ -161,8 +161,8 @@ class DocDal:
 
     @classmethod
     def get_template_content(cls, params):
-        sql = "select * from 352dt_template_content where cpcode = %s and docid = %s and tmsymbol = %s "
-        row = mysql_utils.Database().query_one(sql, (params['cpcode'], params['docid'], params['tmsymbol'],))
+        sql = "select * from 352dt_template_content where docid = %s and tmsymbol = %s "
+        row = mysql_utils.Database().query_one(sql, (params['docid'], params['tmsymbol'],))
         if row is not None:
             template_content = dict(tmcode=row['tmcode'], tmtype=row['tmtype'], tmname=row['tmname'],
                                     tmsymbol=row['tmsymbol'], tmnote=row['tmnote'],
@@ -172,8 +172,9 @@ class DocDal:
 
     @classmethod
     def get_num_label_dict(cls, params):
-        sql = "select * from 352dt_num_label_dict where cpcode = %s and nlsymbol = %s "
-        row = mysql_utils.Database().query_one(sql, (params['cpcode'], params['nlsymbol'], ))
+        sql = "select * from 352dt_num_label_dict where doctype = %s and nlsymbol = %s "
+        params['doctype'] = params['cpcode'].split('-')[0]
+        row = mysql_utils.Database().query_one(sql, (params['doctype'], params['nlsymbol'], ))
         if row is not None:
             num_label_dict = dict(nlcode=row['nlcode'], nltype=row['nltype'], nlname=row['nlname'],
                                   nlsymbol=row['nlsymbol'], nlcontent=row['nlcontent'],
@@ -183,8 +184,8 @@ class DocDal:
 
     @classmethod
     def get_num_label_content(cls, params):
-        sql = "select * from 352dt_num_label_content where cpcode = %s and docid = %s and nlsymbol = %s "
-        row = mysql_utils.Database().query_one(sql, (params['cpcode'], params['docid'], params['nlsymbol'], ))
+        sql = "select * from 352dt_num_label_content where docid = %s and nlsymbol = %s "
+        row = mysql_utils.Database().query_one(sql, (params['docid'], params['nlsymbol'], ))
         if row is not None:
             num_label_content = dict(nlcode=row['nlcode'], nltype=row['nltype'], nlname=row['nlname'],
                                      nlsymbol=row['nlsymbol'], nlcontent=row['nlcontent'],
@@ -213,8 +214,7 @@ class DocDal:
         if len(rllist) > 0:
             rllisttemp = []
             for rl in rllist:
-                rl_result = cls.get_replace_label_content(dict(cpcode=params['cpcode'],
-                                                        docid=params['docid'], rlsymbol=rl,))
+                rl_result = cls.get_replace_label_content(dict(docid=params['docid'], rlsymbol=rl,))
                 if rl_result is None:
                     rl_result = cls.get_replace_label_dict(dict(cpcode=params['cpcode'], rlsymbol=rl,))
                 if rl_result is None:
@@ -227,8 +227,7 @@ class DocDal:
         if len(tmlist) > 0:
             tmlisttemp = []
             for tm in tmlist:
-                tm_result = cls.get_template_content(dict(cpcode=params['cpcode'],
-                                                           docid=params['docid'], tmsymbol=tm, ))
+                tm_result = cls.get_template_content(dict(docid=params['docid'], tmsymbol=tm, ))
                 if tm_result is None:
                     tm_result = cls.get_template_dict(
                         dict(cpcode=params['cpcode'], tmsymbol=tm, ))
@@ -249,8 +248,7 @@ class DocDal:
         if len(nllist) > 0:
             nllisttemp = []
             for nl in nllist:
-                nl_result = cls.get_num_label_content(dict(cpcode=params['cpcode'],
-                                                           docid=params['docid'], nlsymbol=nl, ))
+                nl_result = cls.get_num_label_content(dict(docid=params['docid'], nlsymbol=nl, ))
                 if nl_result is None:
                     nl_result = cls.get_num_label_dict(
                         dict(cpcode=params['cpcode'], nlsymbol=nl, ))
