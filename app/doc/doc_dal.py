@@ -307,3 +307,115 @@ class DocDal:
             return rows
         else:
             return None
+
+    @classmethod
+    def doc_save_temp(cls, params):
+        uid = params['uid']
+        docid = params['docid']
+        cpcode = params['cpcode']
+        cpcontent = params['cpcontent']
+        doctype = params['cpcode'].split('-')[0]
+        database = mysql_utils.Database()
+
+        rlregx = re.compile("(<span.*?rlcode=\"(.*?)\" rlsymbol=\"(.*?)\">(.*?)</span>)")
+        tmregx = re.compile("(<span.*?tmcode=\"(.*?)\" tmsymbol=\"(.*?)\">(.*?)</span>)")
+        nlregx = re.compile("(<span.*?nlcode=\"(.*?)\" nlsymbol=\"(.*?)\">(.*?)</span>)")
+        rllist = re.findall(rlregx, cpcontent)
+        tmlist = re.findall(tmregx, cpcontent)
+        nllist = re.findall(nlregx, cpcontent)
+        rllist = sorted(set(rllist), key=rllist.index)
+        tmlist = sorted(set(tmlist), key=tmlist.index)
+        nllist = sorted(set(nllist), key=nllist.index)
+
+        rl_insert_result = 0
+        tm_insert_result = 0
+        nl_insert_result = 0
+
+        if len(rllist) > 0:
+            for rl in rllist:
+                cpcontent = cpcontent.replace(rl[0], rl[2])
+                rl_dict_sql = "select rlname, rltype, rlnote from 352dt_replace_label_dict " \
+                              "where doctype = %s and rlcode = %s"
+                rl_dict_result = database.query_one(rl_dict_sql, (doctype, rl[1],))
+                if rl_dict_result is None:
+                    return None
+                else:
+                    rl_content_sql = "select * from 352dt_replace_label_content " \
+                                     "where docid = %s and rlcode = %s"
+                    rl_content_result = database.query_one(rl_content_sql, (docid, rl[1],))
+                    if rl_content_result is None:
+                        sql = "insert into " \
+                              "352dt_replace_label_content(uid, docid, cpcode, rlcode, rlname, rltype, rlcontent, " \
+                              "rlsymbol, rlnote, ctime, utime) " \
+                              "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, now(), now())"
+                        rl_result = database.insert_del_update(sql, (
+                            uid, docid, cpcode, rl[1], rl_dict_result['rlname'], rl_dict_result['rltype'],
+                            rl[3], rl[2], rl_dict_result['rlnote'],
+                        ))
+                    else:
+                        sql = "update 352dt_replace_label_content set cpcode = %s, rlcontent = %s, utime = now()" \
+                              "where docid = %s and rlcode = %s"
+                        rl_result = database.insert_del_update(sql, (cpcode, rl[3], docid, rl[1],))
+                rl_insert_result += rl_result
+
+        if len(tmlist) > 0:
+            for tm in tmlist:
+                cpcontent = cpcontent.replace(tm[0], tm[2])
+                tm_dict_sql = "select tmname, tmtype, tmnote from 352dt_template_dict " \
+                              "where doctype = %s and tmcode = %s"
+                tm_dict_result = database.query_one(tm_dict_sql, (doctype, tm[1],))
+                if tm_dict_result is None:
+                    return None
+                else:
+                    tm_content_sql = "select * from 352dt_template_content " \
+                                     "where docid = %s and tmcode = %s"
+                    tm_content_result = database.query_one(tm_content_sql, (docid, tm[1],))
+                    if tm_content_result is None:
+                        sql = "insert into " \
+                              "352dt_template_content(uid, docid, cpcode, tmcode, tmname, tmtype, tmcontent, " \
+                              "tmsymbol, tmnote, ctime, utime) " \
+                              "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, now(), now())"
+                        tm_result = database.insert_del_update(sql, (uid, docid, cpcode, tm[1], tm_dict_result['tmname'],
+                            tm_dict_result['tmtype'], tm[3], tm[2], tm_dict_result['tmnote'],
+                        ))
+                    else:
+                        sql = "update 352dt_template_content set cpcode = %s, tmcontent = %s, utime = now()" \
+                              "where docid = %s and tmcode = %s"
+                        tm_result = database.insert_del_update(sql, (cpcode, tm[3], docid, tm[1],))
+                tm_insert_result += tm_result
+
+        if len(nllist) > 0:
+            for nl in nllist:
+                cpcontent = cpcontent.replace(nl[0], nl[2])
+                nl_dict_sql = "select nlname, nltype, nlnote from 352dt_num_label_dict " \
+                              "where doctype = %s and nlcode = %s"
+                nl_dict_result = database.query_one(nl_dict_sql, (doctype, nl[1],))
+                if nl_dict_result is None:
+                    return None
+                else:
+                    nl_content_sql = "select * from 352dt_num_label_content " \
+                                     "where docid = %s and nlcode = %s"
+                    nl_content_result = database.query_one(nl_content_sql, (docid, nl[1],))
+                    if nl_content_result is None:
+                        sql = "insert into " \
+                              "352dt_num_label_content(uid, docid, cpcode, nlcode, nlname, nltype, nlcontent, " \
+                              "nlsymbol, nlnote, ctime, utime) " \
+                              "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, now(), now())"
+                        nl_result = database.insert_del_update(sql, (uid, docid, cpcode, nl[1], nl_dict_result['nlname'],
+                            nl_dict_result['nltype'], nl[3], nl[2], nl_dict_result['nlnote'],
+                        ))
+                    else:
+                        sql = "update 352dt_num_label_content set cpcode = %s, nlcontent = %s, utime = now()" \
+                              "where docid = %s and nlcode = %s"
+                        nl_result = database.insert_del_update(sql, (cpcode, nl[3], docid, nl[1],))
+                nl_insert_result += nl_result
+
+        cpcontent_sql = "update 352dt_doc_content set bcontent = %s, utime = now() " \
+                        "where docid = %s and cpcode = %s"
+        cpcontent_result = database.insert_del_update(cpcontent_sql, (cpcontent, docid, cpcode))
+
+        if rl_insert_result != len(rllist) or tm_insert_result != len(tmlist) \
+                or nl_insert_result != len(nllist) or cpcontent_result != 1:
+            return None
+        else:
+            return True

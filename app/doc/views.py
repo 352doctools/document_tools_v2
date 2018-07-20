@@ -227,3 +227,28 @@ def doc_check_t():
             return '输入参数不完整或者不正确'
     else:
         return render_template('404.html')
+
+
+@doc.route('/doc_save_temp', methods=['GET', 'POST'])
+def doc_save_temp():
+    if request.method == 'GET':
+        return '<h1>请使用post方法</h1>'
+    elif request.method == 'POST':
+        if is_json(request.get_data()):
+            data = json.loads(request.get_data())
+            if 'uid' in data.keys() and 'docid' in data.keys() and 'cpcode' in data.keys() \
+                    and 'cpcontent' in data.keys():
+                if UserDal.check_uid(data) is not None:
+                    doc_save_return = doc_dal.DocDal().doc_save_temp(data)
+                    if doc_save_return is not None:
+                        return post_json(0, 'success', data='暂存数据成功')
+                    else:
+                        return post_json(data='数据暂存出错')
+                else:
+                    return "用户校验出错"
+            else:
+                return '输入参数不完整或者不正确'
+        else:
+            return '输入参数不完整或者不正确'
+    else:
+        return render_template('404.html')
