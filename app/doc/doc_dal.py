@@ -410,9 +410,22 @@ class DocDal:
                         nl_result = database.insert_del_update(sql, (cpcode, nl[3], docid, nl[1],))
                 nl_insert_result += nl_result
 
-        cpcontent_sql = "update 352dt_doc_content set bcontent = %s, utime = now() " \
-                        "where docid = %s and cpcode = %s"
-        cpcontent_result = database.insert_del_update(cpcontent_sql, (cpcontent, docid, cpcode))
+        doc_dict_sql = "select cptitle from 352dt_doc_base_content where cpcode = %s"
+        doc_dict_result = database.query_one(doc_dict_sql, (cpcode,))
+        if doc_dict_result is None:
+            return None
+        else:
+            doc_content_sql = "select * from 352dt_doc_content where uid = %s and docid = %s and cpcode = %s"
+            doc_content_result = database.query_one(doc_content_sql, (uid, docid, cpcode))
+            if doc_content_result is None:
+                cpcontent_sql = "insert into 352dt_doc_content(uid, docid, cpcode, cptitle, bcontent, ctime, utime)" \
+                                "values (%s, %s, %s, %s, %s, now(), now())"
+                cpcontent_result = database.insert_del_update(cpcontent_sql, (uid, docid, cpcode,
+                                                                              doc_dict_result['cptitle'], cpcontent,))
+            else:
+                cpcontent_sql = "update 352dt_doc_content set bcontent = %s, utime = now() " \
+                                "where docid = %s and cpcode = %s"
+                cpcontent_result = database.insert_del_update(cpcontent_sql, (cpcontent, docid, cpcode))
 
         if rl_insert_result != len(rllist) or tm_insert_result != len(tmlist) \
                 or nl_insert_result != len(nllist) or cpcontent_result != 1:
