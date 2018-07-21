@@ -218,8 +218,10 @@ class DocDal:
                 if rl_result is None:
                     rl_result = cls.get_replace_label_dict(dict(cpcode=params['cpcode'], rlsymbol=rl,))
                 if rl_result is None:
-                    rl_result = dict(err="数字标签字典当前类型文档当前章节中没有 " + rl +" 标签")
-                rllisttemp.append(rl_result)
+                    pass
+                    # rl_result = dict(err="数字标签字典当前类型文档当前章节中没有 " + rl +" 标签")
+                else:
+                    rllisttemp.append(rl_result)
             rllist = rllisttemp
         else:
             rllist = None
@@ -239,7 +241,8 @@ class DocDal:
                     if tminputlist is not None:
                         tm_result['tminputlist'] = tminputlist
                     else:
-                        tm_result['tminputlist'] = dict(err="当前类型文档当前章节该模板标签无可选模板")
+                        pass
+                        # tm_result['tminputlist'] = dict(err="当前类型文档当前章节该模板标签无可选模板")
                 tmlisttemp.append(tm_result)
             tmlist = tmlisttemp
         else:
@@ -253,8 +256,10 @@ class DocDal:
                     nl_result = cls.get_num_label_dict(
                         dict(cpcode=params['cpcode'], nlsymbol=nl, ))
                 if nl_result is None:
-                    nl_result = dict(err="数字标签字典当前类型文档当前章节中没有 " + nl +" 标签")
-                nllisttemp.append(nl_result)
+                    pass
+                    # nl_result = dict(err="数字标签字典当前类型文档当前章节中没有 " + nl +" 标签")
+                else:
+                    nllisttemp.append(nl_result)
             nllist = nllisttemp
         else:
             nllist = None
