@@ -317,9 +317,9 @@ class DocDal:
         doctype = params['cpcode'].split('-')[0]
         database = mysql_utils.Database()
 
-        rlregx = re.compile("(<span.*?rlcode=\"(.*?)\" rlsymbol=\"(.*?)\">(.*?)</span>)")
-        tmregx = re.compile("(<span.*?tmcode=\"(.*?)\" tmsymbol=\"(.*?)\">(.*?)</span>)")
-        nlregx = re.compile("(<span.*?nlcode=\"(.*?)\" nlsymbol=\"(.*?)\">(.*?)</span>)")
+        rlregx = re.compile("(<span[^<]*?rlcode=\"(.*?)\" rlsymbol=\"(.*?)\">(.*?)</span>)")
+        tmregx = re.compile("(<span[^<]*?tmcode=\"(.*?)\" tmsymbol=\"(.*?)\">(.*?)</span>)")
+        nlregx = re.compile("(<span[^<]*?nlcode=\"(.*?)\" nlsymbol=\"(.*?)\">(.*?)</span>)")
         rllist = re.findall(rlregx, cpcontent)
         tmlist = re.findall(tmregx, cpcontent)
         nllist = re.findall(nlregx, cpcontent)
