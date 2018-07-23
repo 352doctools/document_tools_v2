@@ -3,6 +3,7 @@
 from flask import render_template, request
 import json
 from . import other
+import time
 
 
 @other.route('/doc_chapter', methods=['GET', 'POST'])
@@ -352,7 +353,7 @@ def doc_download():
             msg='sucess',
             data=dict(
                 docid="123",
-                docurl="http://www.abc.com/abc.docx",
+                docurl="https://www.liuxue86.com/uploadfile/2016/0819/20160819100139702.doc",
             )
 
         ),
@@ -367,10 +368,8 @@ def doc_download():
         return '<h1>请使用post方法</h1>'
     elif request.method == 'POST':
         data = json.loads(request.get_data())
-        if data["uid"] == '000':
-            return json.dumps(message[0], ensure_ascii=False)
-        else:
-            return json.dumps(message[1], ensure_ascii=False)
+        time.sleep(5)
+        return json.dumps(message[0], ensure_ascii=False)
     else:
         return render_template('404.html')
 
