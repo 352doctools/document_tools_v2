@@ -234,7 +234,8 @@ class DocDal:
                     tm_result = cls.get_template_dict(
                         dict(cpcode=params['cpcode'], tmsymbol=tm, ))
                 if tm_result is None:
-                    tm_result = dict(err="数字标签字典当前类型文档当前章节中没有 " + tm + " 标签")
+                    pass
+                    # tm_result = dict(err="数字标签字典当前类型文档当前章节中没有 " + tm + " 标签")
                 else:
                     tminputlist = cls.get_template_recommend_content_type(
                         dict(cpcode=params['cpcode'], tmcode=tm_result['tmcode'],))
