@@ -244,7 +244,7 @@ class DocDal:
                     else:
                         pass
                         # tm_result['tminputlist'] = dict(err="当前类型文档当前章节该模板标签无可选模板")
-                tmlisttemp.append(tm_result)
+                    tmlisttemp.append(tm_result)
             tmlist = tmlisttemp
         else:
             tmlist = None
