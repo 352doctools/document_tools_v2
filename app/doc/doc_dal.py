@@ -124,7 +124,7 @@ class DocDal:
         params['doctype'] = params['cpcode'].split('-')[0]
         row = mysql_utils.Database().query_one(sql, (params['doctype'], params['rlsymbol']))
         if row is not None:
-            replace_label_dict = dict(rlcode=row['rlcode'], rlname=row['rlname'], rlcontent=row['rlcontent'],
+            replace_label_dict = dict(rlcode=row['rlcode'], rlname=row['rlname'], rlcontent=row['rlname'],
                                       rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], rlchange="0")
             return replace_label_dict
         return row
@@ -146,7 +146,7 @@ class DocDal:
         row = mysql_utils.Database().query_one(sql, (params['doctype'], params['tmsymbol'], ))
         if row is not None:
             template_dict = dict(tmcode=row['tmcode'], tmtype=row['tmtype'], tmname=row['tmname'],
-                                 tmsymbol=row['tmsymbol'], tmnote=row['tmnote'], tmcontent=row['tmcontent'], tmchange="0")
+                                 tmsymbol=row['tmsymbol'], tmnote=row['tmnote'], tmcontent=row['tmname'], tmchange="0")
             return template_dict
         return row
 
@@ -177,7 +177,7 @@ class DocDal:
         row = mysql_utils.Database().query_one(sql, (params['doctype'], params['nlsymbol'], ))
         if row is not None:
             num_label_dict = dict(nlcode=row['nlcode'], nltype=row['nltype'], nlname=row['nlname'],
-                                  nlsymbol=row['nlsymbol'], nlcontent=row['nlcontent'],
+                                  nlsymbol=row['nlsymbol'], nlcontent=row['nlname'],
                                   nlnote=row['nlnote'], nlchange="0")
             return num_label_dict
         return row
