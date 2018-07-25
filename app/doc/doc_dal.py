@@ -565,5 +565,5 @@ class DocDal:
             return None
         return dict(
             docid=params['docid'],
-            docurl=request.url_root + 'download_file' + '?' + 'downloadFile=' + template_name + '_' + docpath,
+            docurl=request.host_url + 'download_file' + '?' + 'downloadFile=' + template_name + '_' + docpath,
         )
