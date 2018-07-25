@@ -1,12 +1,13 @@
 # _*_ coding:utf-8 _*_
 
-from flask import render_template, request
+from flask import render_template, request, send_from_directory
 import json
 import doc_dal
 from . import doc
 from utils.is_json import is_json
 from utils.post_json import post_json
 from auth.user_dal import UserDal
+import os
 
 
 @doc.route('/get_doc_by_id', methods=['GET', 'POST'])
@@ -250,5 +251,42 @@ def doc_save_temp():
                 return '输入参数不完整或者不正确'
         else:
             return '输入参数不完整或者不正确'
+    else:
+        return render_template('404.html')
+
+
+@doc.route('/doc_download', methods=['GET', 'POST'])
+def doc_download():
+    if request.method == 'GET':
+        return '<h1>请使用post方法</h1>'
+    elif request.method == 'POST':
+        if is_json(request.get_data()):
+            data = json.loads(request.get_data())
+            if 'uid' in data.keys() and 'docid' in data.keys():
+                if UserDal.check_uid(data) is None:
+                    return "用户校验出错"
+                if doc_dal.DocDal.get_doc_by_id(data) is None:
+                    return "该文档不存在或已删除"
+                doc_url = doc_dal.DocDal().get_doc_url(data, request)
+                if doc_url is not None:
+                    return post_json(0, 'success', data=doc_url)
+                else:
+                    return post_json(data='文档下载出错')
+            else:
+                return '输入参数不完整或者不正确'
+        else:
+            return '输入参数不完整或者不正确'
+    else:
+        return render_template('404.html')
+
+
+@doc.route('/download_file', methods=['GET', 'POST'])
+def download_file():
+    if request.method == 'POST':
+        return '<h1>请使用get方法</h1>'
+    elif request.method == 'GET':
+        downloadFile = request.args.get('downloadFile')
+        user_doc_dir = os.path.abspath(os.path.dirname(__file__) + '/' + '..' + '/' + '..' + '/user-doc')
+        return send_from_directory(user_doc_dir, downloadFile, as_attachment=True)
     else:
         return render_template('404.html')

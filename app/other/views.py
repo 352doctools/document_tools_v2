@@ -7,8 +7,8 @@ import time
 from utils.post_json import post_json
 
 
-@other.route('/doc_download', methods=['GET', 'POST'])
-def doc_download():
+@other.route('/doc_download_mock', methods=['GET', 'POST'])
+def doc_download_mock():
     message = (
         dict(
             code=0,

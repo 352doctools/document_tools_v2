@@ -5,7 +5,56 @@ from utils import mysql_utils
 import uuid
 import re
 import decimal
+import os
+import shutil
 import time
+try:
+    from xml.etree.cElementTree import XML
+except ImportError:
+    from xml.etree.ElementTree import XML
+import zipfile
+
+WORD_NAMESPACE = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
+PARA = WORD_NAMESPACE + 'p'
+TEXT = WORD_NAMESPACE + 't'
+
+
+def unzip_repalce_file(zipfilename, unziptodir, symbol_list):
+    if not os.path.exists(unziptodir): os.makedirs(unziptodir)
+    zfobj = zipfile.ZipFile(zipfilename)
+    for name in zfobj.namelist():
+        name = name.replace('\\', '/')
+        if name.endswith('/'):
+            os.makedirs(os.path.join(unziptodir, name))
+        else:
+            ext_filename = os.path.join(unziptodir, name)
+            ext_dir = os.path.dirname(ext_filename)
+            if not os.path.exists(ext_dir):
+                os.makedirs(ext_dir)
+            xml_content = zfobj.read(name)
+            for symbol in symbol_list:
+                if symbol['symbol'] in xml_content:
+                    xml_content = xml_content.replace(symbol['symbol'], symbol['content'])
+
+            with open(ext_filename, "wb") as f:
+                f.write(xml_content)
+
+
+def zip_del_dir(dirname, zipfilename):
+    filelist = []
+    if os.path.isfile(dirname):
+        filelist.append(dirname)
+    else:
+        for root, dirs, files in os.walk(dirname):
+            for name in files:
+                filelist.append(os.path.join(root, name))
+
+    zf = zipfile.ZipFile(zipfilename, "w", zipfile.zlib.DEFLATED)
+    for tar in filelist:
+        arcname = tar[len(dirname):]
+        zf.write(tar, arcname)
+    zf.close()
+    shutil.rmtree(dirname)
 
 
 class DocDal:
@@ -27,6 +76,12 @@ class DocDal:
         else:
             return None
         return doc.to_dict()
+
+    @classmethod
+    def get_docpath_by_id(cls, docid):
+        sql = "select * from 352dt_doc_info where doc_id = %s and doc_state = 1"
+        row = mysql_utils.Database().query_one(sql, (docid,))
+        return row
 
     # 通过用户名及密码注册对象
     @classmethod
@@ -52,6 +107,12 @@ class DocDal:
         return rows
 
     @classmethod
+    def get_doc_template_name(cls, doc_type):
+        sql = "select dict_text from 352dt_base_dict where dict_name = %s"
+        row = mysql_utils.Database().query_one(sql, (doc_type,))
+        return row
+
+    @classmethod
     def get_doc_typeinfo(cls):
         rows = cls.get_doc_dict('doc_type')
         if len(rows) > 0:
@@ -65,7 +126,7 @@ class DocDal:
 
     @classmethod
     def insert_doc_and_get_doc(cls, params):
-        download_url = "http://" + str(uuid.uuid1()) + ".docx"
+        download_url = str(uuid.uuid1()) + ".docx"
         sql1 = "insert into 352dt_doc_info(doc_id, doc_type, doc_name, doc_path, doc_user_id, ctime, utime, doc_state) " \
                "values (uuid(), %s, %s, %s, %s, now(), now(), 1)"
         sql2 = "select * from 352dt_doc_info " \
@@ -438,3 +499,71 @@ class DocDal:
             return None
         else:
             return True
+
+    @classmethod
+    def get_symbol_list(cls, params):
+        symbol_list = []
+        sql = "select rlsymbol, rlcontent from 352dt_replace_label_content " \
+              "where uid = %s and docid = %s"
+        rows = mysql_utils.Database().query_all(sql, (params['uid'], params['docid'],))
+        rlsymbol_list = []
+        if len(rows) > 0:
+            for row in rows:
+                rlsymbol = dict(
+                    symbol=row['rlsymbol'],
+                    content=row['rlcontent'],
+                )
+                rlsymbol_list.append(rlsymbol)
+        symbol_list.extend(rlsymbol_list)
+
+        sql = "select nlsymbol, nlcontent from 352dt_num_label_content " \
+              "where uid = %s and docid = %s"
+        rows = mysql_utils.Database().query_all(sql, (params['uid'], params['docid'],))
+        nlsymbol_list = []
+        if len(rows) > 0:
+            for row in rows:
+                nlsymbol = dict(
+                    symbol=row['nlsymbol'],
+                    content=row['nlcontent'],
+                )
+                nlsymbol_list.append(nlsymbol)
+        symbol_list.extend(nlsymbol_list)
+
+        sql = "select tmsymbol, tmcontent from 352dt_template_content " \
+              "where uid = %s and docid = %s"
+        rows = mysql_utils.Database().query_all(sql, (params['uid'], params['docid'],))
+        tmsymbol_list = []
+        if len(rows) > 0:
+            for row in rows:
+                tmsymbol = dict(
+                    symbol=row['tmsymbol'],
+                    content=row['tmcontent'],
+                )
+                tmsymbol_list.append(tmsymbol)
+        symbol_list.extend(tmsymbol_list)
+        # symbol_list.extend([{"symbol": "((str_company_issuer))", "content": "((str_company_issuer111))"}, ])
+        return symbol_list
+
+    @classmethod
+    def get_doc_url(cls, params, request):
+        doc_type = cls.get_doc_by_id(params)['doctype']
+        template_name = cls.get_doc_template_name(doc_type)
+        if template_name is None:
+            return None
+        template_name = template_name['dict_text']
+        docpath = cls.get_docpath_by_id(params['docid'])['doc_path']
+        template_dir = os.path.abspath(os.path.dirname(__file__) + '/' + '..' + '/' + '..' + '/template')
+        user_doc_dir = os.path.abspath(os.path.dirname(__file__) + '/' + '..' + '/' + '..' + '/user-doc')
+
+        try:
+            unzip_repalce_file(template_dir + '/' + template_name + ".docx",
+                               template_dir + '/' + template_name + '_' + params['docid'],
+                               cls.get_symbol_list(params))
+            zip_del_dir(template_dir + '/' + template_name + '_' + params['docid'],
+                    user_doc_dir + '/' + template_name + '_' + docpath)
+        except:
+            return None
+        return dict(
+            docid=params['docid'],
+            docurl=request.url_root + 'download_file' + '?' + 'downloadFile=' + template_name + '_' + docpath,
+        )
