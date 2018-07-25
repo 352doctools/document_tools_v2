@@ -9,7 +9,7 @@ from __init__ import create_app
 
 if __name__ == '__main__':
     # 局域网访问调试
-    create_app().run(host='127.0.0.1', port=8090, debug=True)
+    create_app().run(host='0.0.0.0', port=8090, debug=True)
     # 本机调试
     # app.run(debug=True)
 
