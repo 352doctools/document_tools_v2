@@ -7,7 +7,7 @@ from . import auth
 from utils.is_json import is_json
 from utils.post_json import post_json
 
-
+# 登陆路由
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
         if request.method == 'GET':
@@ -28,7 +28,7 @@ def login():
         else:
             return render_template('404.html')
 
-
+# 登出路由
 @auth.route('/logout', methods=['GET', 'POST'])
 def logout():
     if request.method == 'GET':
@@ -50,7 +50,7 @@ def logout():
     else:
         return render_template('404.html')
 
-
+# 注册路由
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
@@ -72,7 +72,7 @@ def register():
     else:
         return render_template('404.html')
 
-
+# 注册用户名重复检查路由
 @auth.route('/register_name_check', methods=['GET', 'POST'])
 def register_name_check():
     if request.method == 'GET':

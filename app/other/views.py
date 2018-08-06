@@ -6,7 +6,7 @@ from . import other
 import time
 from utils.post_json import post_json
 
-
+# 模拟下载路由
 @other.route('/doc_download_mock', methods=['GET', 'POST'])
 def doc_download_mock():
     message = (

@@ -2,7 +2,7 @@
 
 import json
 
-
+# json格式检查工具
 def is_json(json_str):
     try:
         json_object = json.loads(json_str)

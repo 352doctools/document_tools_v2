@@ -9,7 +9,7 @@ from utils.post_json import post_json
 from auth.user_dal import UserDal
 import os
 
-
+# 通过id获取文档路由
 @doc.route('/get_doc_by_id', methods=['GET', 'POST'])
 def get_doc_by_id():
     if request.method == 'GET':
@@ -30,7 +30,7 @@ def get_doc_by_id():
     else:
         return render_template('404.html')
 
-
+# 获取用户文档列表路由
 @doc.route('/doc_list', methods=['GET', 'POST'])
 def get_doc_list():
     if request.method == 'GET':
@@ -52,7 +52,7 @@ def get_doc_list():
     else:
         return render_template('404.html')
 
-
+# 新建文档路由
 @doc.route('/doc_create', methods=['GET', 'POST'])
 def doc_create():
     if request.method == 'GET':
@@ -73,7 +73,7 @@ def doc_create():
     else:
         return render_template('404.html')
 
-
+# 新建路由
 @doc.route('/doc_create1', methods=['GET', 'POST'])
 def doc_create1():
     if request.method == 'GET':
@@ -99,7 +99,7 @@ def doc_create1():
     else:
         return render_template('404.html')
 
-
+# 删除文档路由
 @doc.route('/doc_delete', methods=['GET', 'POST'])
 def doc_delete():
     if request.method == 'GET':
@@ -123,7 +123,7 @@ def doc_delete():
     else:
         return render_template('404.html')
 
-
+# 获取文档章节目录路由
 @doc.route('/doc_chapter', methods=['GET', 'POST'])
 def doc_chapter():
     if request.method == 'GET':
@@ -155,7 +155,7 @@ def doc_chapter():
     else:
         return render_template('404.html')
 
-
+# 章节模块查询路由
 @doc.route('/doc_cl_check', methods=['GET', 'POST'])
 def get_doc_cl_check():
     if request.method == 'GET':
@@ -179,7 +179,7 @@ def get_doc_cl_check():
     else:
         return render_template('404.html')
 
-
+# 计算数字标签数值
 @doc.route('/calc_nl_value', methods=['GET', 'POST'])
 def calc_nl_value():
     if request.method == 'GET':
@@ -204,7 +204,7 @@ def calc_nl_value():
     else:
         return render_template('404.html')
 
-
+# 模块查询路由
 @doc.route('/doc_check_t', methods=['GET', 'POST'])
 def doc_check_t():
     if request.method == 'GET':
@@ -229,7 +229,7 @@ def doc_check_t():
     else:
         return render_template('404.html')
 
-
+# 文档暂存路由
 @doc.route('/doc_save_temp', methods=['GET', 'POST'])
 def doc_save_temp():
     if request.method == 'GET':
@@ -254,7 +254,7 @@ def doc_save_temp():
     else:
         return render_template('404.html')
 
-
+# 获取文档下载地址路由
 @doc.route('/doc_download', methods=['GET', 'POST'])
 def doc_download():
     if request.method == 'GET':
@@ -279,7 +279,7 @@ def doc_download():
     else:
         return render_template('404.html')
 
-
+# 下载路由
 @doc.route('/download_file', methods=['GET', 'POST'])
 def download_file():
     if request.method == 'POST':

@@ -1,6 +1,6 @@
 # _*_ coding:utf-8 _*_
 
-
+# 文档类
 class Doc:
     def __init__(self, docid=None, doctype=None, docname=None, docctime=None, docutime=None, docstate=None):
         self.docid = docid

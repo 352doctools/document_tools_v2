@@ -18,7 +18,7 @@ WORD_NAMESPACE = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}
 PARA = WORD_NAMESPACE + 'p'
 TEXT = WORD_NAMESPACE + 't'
 
-
+# docx处理函数
 def unzip_repalce_file(zipfilename, unziptodir, symbol_list):
     if not os.path.exists(unziptodir): os.makedirs(unziptodir)
     zfobj = zipfile.ZipFile(zipfilename)
@@ -39,7 +39,7 @@ def unzip_repalce_file(zipfilename, unziptodir, symbol_list):
             with open(ext_filename, "wb") as f:
                 f.write(xml_content)
 
-
+# 删除文档解压缩临时文件
 def zip_del_dir(dirname, zipfilename):
     filelist = []
     if os.path.isfile(dirname):
@@ -56,34 +56,38 @@ def zip_del_dir(dirname, zipfilename):
     zf.close()
     shutil.rmtree(dirname)
 
-
+# 文档处理对象
 class DocDal:
     def __init__(self):
         pass
     persist = None
 
-    # 通过用户名及密码查询用户对象
+    # 通过docid 查询文档信息
     @classmethod
     def get_doc_by_id(cls, params):
         sql = "select * from 352dt_doc_info where doc_id = %s and doc_state = 1"
         row = mysql_utils.Database().query_one(sql, (params['docid'],))
         if row is not None:
+            docstate_sql = "select (select count(*) from 352dt_doc_content where docid = %s)" \
+                           "/(select count(*) from 352dt_doc_base_content where doctype = %s " \
+                           "and bcontent like %s) as result"
+            result = mysql_utils.Database().query_one(docstate_sql, (row['doc_id'], row['doc_type'], '%((%'))
             doc = doc_model.Doc(docid=row['doc_id'], doctype=row['doc_type'], docname=row['doc_name'],
                                 docctime=row['ctime'].strftime("%Y-%m-%d %H:%M:%S"),
                                 docutime=row['utime'].strftime("%Y-%m-%d %H:%M:%S"),
-                                docstate="3/13")
+                                docstate='%.1f%%' % (100 * result['result']))
             # 实例化一个对象，将查询结果添加给对象的属性
         else:
             return None
         return doc.to_dict()
-
+    # 通过docid得到文档
     @classmethod
     def get_docpath_by_id(cls, docid):
         sql = "select * from 352dt_doc_info where doc_id = %s and doc_state = 1"
         row = mysql_utils.Database().query_one(sql, (docid,))
         return row
 
-    # 通过用户名及密码注册对象
+    # 通过uid得到用户已编辑的文档列表
     @classmethod
     def get_doc_list(cls, params):
         sql = "select * from 352dt_doc_info where doc_user_id = %s and doc_state = 1 order by utime desc"
@@ -91,27 +95,31 @@ class DocDal:
         if len(rows) > 0:
             doc_list = []
             for row in rows:
+                docstate_sql = "select (select count(*) from 352dt_doc_content where docid = %s)" \
+                               "/(select count(*) from 352dt_doc_base_content where doctype = %s " \
+                               "and bcontent like %s) as result"
+                result = mysql_utils.Database().query_one(docstate_sql, (row['doc_id'], row['doc_type'], '%((%'))
                 doc = doc_model.Doc(docid=row['doc_id'], doctype=row['doc_type'], docname=row['doc_name'],
                                     docctime=row['ctime'].strftime("%Y-%m-%d %H:%M:%S"),
                                     docutime=row['utime'].strftime("%Y-%m-%d %H:%M:%S"),
-                                    docstate="3/13")
+                                    docstate='%.1f%%' % (100*result['result']))
                 doc_list.append(doc.to_dict())
             return doc_list
         else:
             return None
-
+    # 字典查询函数
     @classmethod
     def get_doc_dict(cls, dict_class):
         sql = "select * from 352dt_base_dict where dict_class = %s order by dict_class"
         rows = mysql_utils.Database().query_all(sql, (dict_class,))
         return rows
-
+    # 查询字典对应文本
     @classmethod
     def get_doc_template_name(cls, doc_type):
         sql = "select dict_text from 352dt_base_dict where dict_name = %s"
         row = mysql_utils.Database().query_one(sql, (doc_type,))
         return row
-
+    # 得到文档类型
     @classmethod
     def get_doc_typeinfo(cls):
         rows = cls.get_doc_dict('doc_type')
@@ -123,7 +131,7 @@ class DocDal:
             return doc_type_list
         else:
             return None
-
+    # 插入新的文档并且获得该文档的docid
     @classmethod
     def insert_doc_and_get_doc(cls, params):
         download_url = str(uuid.uuid1()) + ".docx"
@@ -135,14 +143,14 @@ class DocDal:
                                                                  params1=(params['doctype'], params['docname'],
                                                                           download_url, params['uid']))
         return row
-
+    # 删除文档
     @classmethod
     def delete_doc(cls, params):
         sql = "update 352dt_doc_info set doc_state='0' " \
               "where doc_user_id=%s and doc_id = %s and doc_state = 1"
         rowcount = mysql_utils.Database().insert_del_update(sql, (params['uid'], params['docid'],))
         return rowcount
-
+    # 得到文档的目录结构
     @classmethod
     def doc_chapter(cls, params):
         doc_dict = cls.get_doc_by_id(params)
@@ -160,7 +168,7 @@ class DocDal:
             return [doc_dict, doc_chapter_list]
 
         return [doc_dict, None]
-
+    # 得到文档模板内容
     @classmethod
     def get_doc_base_content(cls, params):
         sql = "select * from 352dt_doc_base_content where cpcode = %s"
@@ -169,7 +177,7 @@ class DocDal:
             doc_base_content = dict(cpcode=row['cpcode'], bcontent=row['bcontent'], cpchange="0")
             return doc_base_content
         return row
-
+    # 得到用户文档的内容
     @classmethod
     def get_doc_content(cls, params):
         sql = "select * from 352dt_doc_content where docid = %s and cpcode = %s"
@@ -178,7 +186,7 @@ class DocDal:
             doc_content = dict(cpcode=row['cpcode'], bcontent=row['bcontent'], cpchange="1")
             return doc_content
         return row
-
+    # 得到替换标签的字典内容
     @classmethod
     def get_replace_label_dict(cls, params):
         sql = "select * from 352dt_replace_label_dict where doctype = %s and rlsymbol = %s "
@@ -189,7 +197,7 @@ class DocDal:
                                       rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], rlchange="0")
             return replace_label_dict
         return row
-
+    # 得到替换标签用户编辑内容
     @classmethod
     def get_replace_label_content(cls, params):
         sql = "select * from 352dt_replace_label_content where docid = %s and rlsymbol = %s "
@@ -199,7 +207,7 @@ class DocDal:
                                          rlsymbol=row['rlsymbol'], rlnote=row['rlnote'], rlchange="1")
             return replace_label_content
         return row
-
+    # 得到模板字典
     @classmethod
     def get_template_dict(cls, params):
         sql = "select * from 352dt_template_dict where doctype = %s and tmsymbol = %s "
@@ -210,7 +218,7 @@ class DocDal:
                                  tmsymbol=row['tmsymbol'], tmnote=row['tmnote'], tmcontent=row['tmname'], tmchange="0")
             return template_dict
         return row
-
+    # 得到模板文档里模板标签的内容
     @classmethod
     def get_template_recommend_content_type(cls, params):
         sql = "select distinct tminputcode, tminputtext from 352dt_template_recommend_content " \
@@ -219,7 +227,7 @@ class DocDal:
         if len(rows) > 0:
             return rows
         return None
-
+    # 得到模板标签用户内容
     @classmethod
     def get_template_content(cls, params):
         sql = "select * from 352dt_template_content where docid = %s and tmsymbol = %s "
@@ -230,7 +238,7 @@ class DocDal:
                                     tmcontent=row['tmcontent'], tmchange="1")
             return template_content
         return row
-
+    # 得到数字标签字典内容
     @classmethod
     def get_num_label_dict(cls, params):
         sql = "select * from 352dt_num_label_dict where doctype = %s and nlsymbol = %s "
@@ -242,7 +250,7 @@ class DocDal:
                                   nlnote=row['nlnote'], nlchange="0")
             return num_label_dict
         return row
-
+    # 得到数字标签用户编辑内容
     @classmethod
     def get_num_label_content(cls, params):
         sql = "select * from 352dt_num_label_content where docid = %s and nlsymbol = %s "
@@ -253,7 +261,7 @@ class DocDal:
                                      nlnote=row['nlnote'], nlchange="1")
             return num_label_content
         return row
-
+    # 得到文档内容，查询标签并替换标签
     @classmethod
     def get_doc_cl_check(cls, params):
         doc_cl_check = cls.get_doc_content(params)
@@ -331,7 +339,7 @@ class DocDal:
         doc_cl_check['nllist'] = nllist
         return doc_cl_check
 
-
+    # 得到数字标签计算公式
     @classmethod
     def get_formula(cls, params):
         # 通过params里面的'cpcode'得到所有公式formulas
@@ -347,7 +355,7 @@ class DocDal:
             return formulas
         else:
             return None
-
+    # 根据公式计算数字标签
     @classmethod
     def calc_nl_value(cls, params):
         formulas = cls.get_formula(params)
@@ -362,7 +370,7 @@ class DocDal:
             calc = eval(formula['lcontent'])
             formula['lcontent'] = str(decimal.Decimal(calc).quantize(decimal.Decimal('0.00')))
         return formulas
-
+    # 得到模板选择内容
     @classmethod
     def doc_check_t(cls, params):
         sql = "select tminputcode, tmcontentcode, tmcontent, ctime, tmsource " \
@@ -374,7 +382,7 @@ class DocDal:
             return rows
         else:
             return None
-
+    # 暂存文档，将前台传回数据标准化并保存
     @classmethod
     def doc_save_temp(cls, params):
         uid = params['uid']
@@ -499,7 +507,7 @@ class DocDal:
             return None
         else:
             return True
-
+    # 得到标签列表
     @classmethod
     def get_symbol_list(cls, params):
         symbol_list = []
@@ -543,7 +551,7 @@ class DocDal:
         symbol_list.extend(tmsymbol_list)
         # symbol_list.extend([{"symbol": "((str_company_issuer))", "content": "((str_company_issuer111))"}, ])
         return symbol_list
-
+    # 获取文档下载连接
     @classmethod
     def get_doc_url(cls, params, request):
         doc_type = cls.get_doc_by_id(params)['doctype']

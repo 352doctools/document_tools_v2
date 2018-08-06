@@ -4,13 +4,13 @@ from model import user_model
 from utils import mysql_utils
 from . import hash
 
-
+#用户类
 class UserDal:
     def __init__(self):
         pass
     persist = None
 
-    @classmethod
+    @classmethod #检查uid
     def check_uid(cls, params):
         sql = "select * from 352dt_user_info where uid = %s"
         row = mysql_utils.Database().query_one(sql, (params['uid'],))
