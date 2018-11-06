@@ -7,9 +7,11 @@
 
 
 from flask_bootstrap import Bootstrap
-from flask import Flask
+from flask import Flask, request, redirect, g
 from flask_cors import CORS
 from flask_login import LoginManager
+from utils import jwt_utils, post_json
+from auth import user_dal
 
 bootstrap = Bootstrap()
 login_manager = LoginManager()
@@ -17,11 +19,57 @@ login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
 
 
+# 用户鉴权
+def identify(request):
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        auth_tokenArr = auth_header.split(" ")
+        if not auth_tokenArr or auth_tokenArr[0] != 'JWT' or len(auth_tokenArr) != 2:
+            result = False
+        else:
+            auth_token = auth_tokenArr[1]
+            payload = jwt_utils.decode_auth_token(auth_token)
+            if not isinstance(payload, str):
+                user = user_dal.UserDal().check_uid({'uid': payload['data']['id']})
+                if user is None:
+                    result = False
+                else:
+                    if user.login_time == payload['data']['login_time']:
+                        result = True
+                    else:
+                        result = False
+            else:
+                result = False
+    else:
+        result = False
+    return result
+
 def create_app():
     app = Flask(__name__)
     # 解决跨域问题
     # CORS(app, resources={r"/*": {"origins": "*"}}, send_wildcard=True)
     CORS(app, supports_credentials=True)
+
+    @app.before_request
+    def before_request():
+        if request.path == '/login':
+            return None
+        if not identify(request):
+            g.string = 'token认证失败'
+        else:
+            g.string = ''
+
+
+
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        if request.method == 'OPTIONS':
+            response.headers['Access-Control-Allow-Methods'] = 'DELETE, GET, POST, PUT'
+            headers = request.headers.get('Access-Control-Request-Headers')
+            if headers:
+                response.headers['Access-Control-Allow-Headers'] = headers
+        return response
     bootstrap.init_app(app)
     login_manager.init_app(app)
 

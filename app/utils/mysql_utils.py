@@ -17,7 +17,7 @@ curr_dir = os.path.dirname(os.path.abspath(__file__))
 config_file = os.path.join(curr_dir, filename)
 cf.read(config_file)  # 读取配置文件
 
-remoteSSH = False
+remoteSSH = True
 # 这个参数主要是用于控制远程ssh连接数据库还是本地连接数据库,True为远程，False为本地
 
 server_ip = cf.get("Database", "server_ip")

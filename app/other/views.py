@@ -27,10 +27,10 @@ def doc_download_mock():
     )
 
     if request.method == 'GET':
-        return '<h1>请使用post方法</h1>'
+        return post_json('error', '请使用post方法')
     elif request.method == 'POST':
         time.sleep(5)
-        return post_json(0, 'success', data=message[0])
+        return post_json('success', data=message[0])
     else:
         return render_template('404.html')
 

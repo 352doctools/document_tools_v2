@@ -16,7 +16,8 @@ class UserDal:
         row = mysql_utils.Database().query_one(sql, (params['uid'],))
         if row is not None:
             user = user_model.User(uid=row['uid'], uname=row['uname'], usergroup=row['user_group'],
-                                   nickname=row['nickname'], mail=row['mail'], phone=row['phone'])
+                                   nickname=row['nickname'], mail=row['mail'], phone=row['phone'],
+                                   login_time=row['login_time'])
             # 实例化一个对象，将查询结果逐一添加给对象的属性
         else:
             return None
@@ -24,14 +25,17 @@ class UserDal:
 
     # 通过用户名及密码查询用户对象
     @classmethod
-    def login_auth(cls, params):
+    def login_auth(cls, params, login_time):
         passwd = hash.salted_password(params['passwd'])
 
         sql = "select * from 352dt_user_info where uname = %s and passwd = %s"
         row = mysql_utils.Database().query_one(sql, (params['uname'], passwd))
         if row is not None:
+            sql = "UPDATE 352dt_user_info set login_time = %s where uid = %s"
+            mysql_utils.Database().insert_del_update(sql, (login_time, row['uid']))
             user = user_model.User(uid=row['uid'], uname=row['uname'], usergroup=row['user_group'],
-                                   nickname=row['nickname'], mail=row['mail'], phone=row['phone'])
+                                   nickname=row['nickname'], mail=row['mail'], phone=row['phone'],
+                                   login_time=login_time)
             # 实例化一个对象，将查询结果逐一添加给对象的属性
         else:
             return None

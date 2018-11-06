@@ -7,13 +7,14 @@ from flask_login import UserMixin
 #  save user name and password_hash
 # 用户类
 class User(UserMixin):
-    def __init__(self, uid=None, uname=None, usergroup=None, nickname=None, mail=None, phone=None):
+    def __init__(self, uid=None, uname=None, usergroup=None, nickname=None, mail=None, phone=None, login_time=None):
         self.uid = uid
         self.uname = uname
         self.usergroup = usergroup
         self.nickname = nickname
         self.mail = mail
         self.phone = phone
+        self.login_time = login_time
 
     def to_dict(self):
         return self.__dict__
