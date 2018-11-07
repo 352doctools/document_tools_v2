@@ -7,7 +7,7 @@
 
 
 from flask_bootstrap import Bootstrap
-from flask import Flask, request, redirect, g
+from flask import Flask, request, redirect, g, session
 from flask_cors import CORS
 from flask_login import LoginManager
 from utils import jwt_utils, post_json
@@ -30,14 +30,31 @@ def identify(request):
             auth_token = auth_tokenArr[1]
             payload = jwt_utils.decode_auth_token(auth_token)
             if not isinstance(payload, str):
+                # user = user_dal.UserDal().check_uid({'uid': payload['data']['id']})
+                # if user is None:
+                #     result = False
+                # else:
+                #     if payload['data']['id'] not in session:
+                #         return False
+                #     else:
+                #         if user.login_time == payload['data']['login_time']:
+                #             result = True
+                #         else:
+                #             result = False
                 user = user_dal.UserDal().check_uid({'uid': payload['data']['id']})
                 if user is None:
                     result = False
                 else:
-                    if user.login_time == payload['data']['login_time']:
-                        result = True
+                    if payload['data']['id'] not in session:
+                        return False
                     else:
-                        result = False
+                        if session[payload['data']['id']] != auth_token:
+                            return False
+                        else:
+                            if user.login_time == payload['data']['login_time']:  # 防止浏览器重新发送请求token仍然有效， session二义性
+                                result = True
+                            else:
+                                result = False
             else:
                 result = False
     else:
@@ -46,9 +63,11 @@ def identify(request):
 
 def create_app():
     app = Flask(__name__)
+    app.secret_key = "secret"
     # 解决跨域问题
     # CORS(app, resources={r"/*": {"origins": "*"}}, send_wildcard=True)
     CORS(app, supports_credentials=True)
+
 
     @app.before_request
     def before_request():

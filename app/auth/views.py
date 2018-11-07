@@ -1,6 +1,7 @@
 # _*_ coding:utf-8 _*_
 
-from flask import render_template, request, g
+from flask import render_template, request, g, session
+from flask_login import logout_user
 import json
 import user_dal
 from . import auth
@@ -27,6 +28,8 @@ def login():
             return post_json('error', '输入参数不完整或者不正确')
         if user is not None:
             token = jwt_utils.encode_auth_token(user.uid, login_time)
+            session.pop(user.uid, None)
+            session[user.uid] = token
             return post_json('success', data=token.decode())
         else:
             return post_json('error', '用户名或密码错误')
@@ -37,25 +40,20 @@ def login():
 # 获得用户信息
 @auth.route('/user', methods=['GET', 'POST'])
 def user():
-        if request.method == 'GET':
-            return post_json('error', '请使用post方法')
-        elif request.method == 'POST':
-            if g.string == 'token认证失败':
-                return post_json('error', g.string)
-            if is_json(request.get_data()):
-                data = json.loads(request.get_data())
-                if 'uid' in data.keys():
-                    user = user_dal.UserDal().check_uid({'uid': data['uid']})
-                else:
-                    return post_json('error', '输入参数不完整或者不正确')
-            else:
-                return post_json('error', '输入参数不完整或者不正确')
-            if user is not None:
-                return post_json('success', data=user.to_dict())
-            else:
-                return post_json('error', '用户id不正确')
+    if request.method == 'GET':
+        return post_json('error', '请使用post方法')
+    elif request.method == 'POST':
+        if g.string == 'token认证失败':
+            return post_json('error', g.string)
         else:
-            return render_template('404.html')
+            uid = jwt_utils.get_uid_token(request)[0]
+            user = user_dal.UserDal().check_uid({'uid': uid})
+        if user is not None:
+            return post_json('success', data=user.to_dict())
+        else:
+            return post_json('error', '用户id不正确')
+    else:
+        return render_template('404.html')
 
 
 # 登出路由
@@ -64,14 +62,14 @@ def logout():
     if request.method == 'GET':
         return post_json('error', '请使用post方法')
     elif request.method == 'POST':
-        if is_json(request.get_data()):
-            data = json.loads(request.get_data())
-            if 'uid' in data.keys() and 'uname' in data.keys():
-                success = True
-            else:
-                return post_json('error', '输入参数不完整或者不正确')
+        login_time = int(time.time())
+        if g.string == 'token认证失败':
+            return post_json('error', g.string)
         else:
-            return post_json('error', '输入参数不完整或者不正确')
+            uid = jwt_utils.get_uid_token(request)[0]
+            session.pop(uid, None)
+            user_dal.UserDal().update_login_time(uid, -login_time)
+            success = True
         if success:
             return post_json('success', '用户登出成功')
         else:

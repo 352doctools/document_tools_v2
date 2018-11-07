@@ -39,8 +39,13 @@ class UserDal:
             # 实例化一个对象，将查询结果逐一添加给对象的属性
         else:
             return None
-
         return user
+
+    # 通过用户名及密码查询用户对象
+    @classmethod
+    def update_login_time(cls, uid, login_time):
+        sql = "UPDATE 352dt_user_info set login_time = %s where uid = %s"
+        mysql_utils.Database().insert_del_update(sql, (login_time, uid))
 
     # 通过用户名及密码注册对象
     @classmethod
