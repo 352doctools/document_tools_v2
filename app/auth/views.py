@@ -45,13 +45,9 @@ def user():
     elif request.method == 'POST':
         if g.string == 'token认证失败':
             return post_json('error', g.string)
-        else:
-            uid = jwt_utils.get_uid_token(request)[0]
-            user = user_dal.UserDal().check_uid({'uid': uid})
-        if user is not None:
-            return post_json('success', data=user.to_dict())
-        else:
-            return post_json('error', '用户id不正确')
+        uid = jwt_utils.get_uid_token(request)[0]
+        user_temp = user_dal.UserDal().check_uid({'uid': uid})
+        return post_json('success', data=user_temp.to_dict())
     else:
         return render_template('404.html')
 

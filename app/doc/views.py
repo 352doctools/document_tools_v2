@@ -1,12 +1,13 @@
 # _*_ coding:utf-8 _*_
 
-from flask import render_template, request, send_from_directory
+from flask import render_template, request, send_from_directory, g
 import json
 import doc_dal
 from . import doc
 from utils.is_json import is_json
 from utils.post_json import post_json
 from auth.user_dal import UserDal
+import utils.jwt_utils as jwt_utils
 import os
 
 
@@ -31,72 +32,59 @@ def get_doc_by_id():
     else:
         return render_template('404.html')
 
+
 # 获取用户文档列表路由
 @doc.route('/doc_list', methods=['GET', 'POST'])
 def get_doc_list():
     if request.method == 'GET':
         return post_json('error', '请使用post方法')
     elif request.method == 'POST':
-        if is_json(request.get_data()):
-            data = json.loads(request.get_data())
-            if 'uid' in data.keys():
-                if UserDal.check_uid(data) is not None:
-                    doc_list = doc_dal.DocDal().get_doc_list(data)
-                else:
-                    return post_json('error', '用户校验出错')
-            else:
-                return post_json('error', '输入参数不完整或者不正确')
-        else:
-            return post_json('error', '输入参数不完整或者不正确')
+        if g.string == 'token认证失败':
+            return post_json('error', g.string)
+        uid = jwt_utils.get_uid_token(request)[0]
+        doc_list = doc_dal.DocDal().get_doc_list({'uid': uid})
         return post_json('success', data=dict(docinfo=doc_list,))
 
     else:
         return render_template('404.html')
 
-# 新建文档路由
+
+# 获取文档类型
+@doc.route('/doc_temp', methods=['GET', 'POST'])
+def doc_temp():
+    if request.method == 'GET':
+        return post_json('error', '请使用post方法')
+    elif request.method == 'POST':
+        if g.string == 'token认证失败':
+            return post_json('error', g.string)
+        doc_typeinfo = doc_dal.DocDal().get_doc_typeinfo()
+        return post_json('success', data=dict(doctypeinfo=doc_typeinfo))
+    else:
+        return render_template('404.html')
+
+# 新建路由
 @doc.route('/doc_create', methods=['GET', 'POST'])
 def doc_create():
     if request.method == 'GET':
         return post_json('error', '请使用post方法')
     elif request.method == 'POST':
+        if g.string == 'token认证失败':
+            return post_json('error', g.string)
         if is_json(request.get_data()):
             data = json.loads(request.get_data())
-            if 'uid' in data.keys():
-                if UserDal.check_uid(data) is not None:
-                    doc_typeinfo = doc_dal.DocDal().get_doc_typeinfo()
+            uid = jwt_utils.get_uid_token(request)[0]
+            data.update({'uid': uid})
+            if 'docname' in data.keys() and 'doctype' in data.keys():
+                new_doc = doc_dal.DocDal().insert_doc_and_get_doc(data)
+                if new_doc is not None:
+                    doc_id = new_doc['doc_id']
+                    return post_json('success', data=dict(docid=doc_id))
                 else:
-                    return post_json('error', '用户校验出错')
+                    return post_json('error', '新建文档出错')
             else:
                 return post_json('error', '输入参数不完整或者不正确')
         else:
             return post_json('error', '输入参数不完整或者不正确')
-        return post_json('seccess', data=dict(doctypeinfo=doc_typeinfo))
-    else:
-        return render_template('404.html')
-
-# 新建路由
-@doc.route('/doc_create1', methods=['GET', 'POST'])
-def doc_create1():
-    if request.method == 'GET':
-        return post_json('error', '请使用post方法')
-    elif request.method == 'POST':
-        if is_json(request.get_data()):
-            data = json.loads(request.get_data())
-            if 'uid' in data.keys() and 'docname' in data.keys() and 'doctype' in data.keys():
-                if UserDal.check_uid(data) is not None:
-                    new_doc = doc_dal.DocDal().insert_doc_and_get_doc(data)
-                    if new_doc is not None:
-                        doc_id = new_doc['doc_id']
-                else:
-                    return post_json('error', '用户校验出错')
-            else:
-                return post_json('error', '输入参数不完整或者不正确')
-        else:
-            return post_json('error', '输入参数不完整或者不正确')
-        if new_doc is not None:
-            return post_json('success', data=dict(docid=doc_id))
-        else:
-            return post_json('error', '新建文档出错')
     else:
         return render_template('404.html')
 
