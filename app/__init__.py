@@ -86,8 +86,13 @@ def create_app():
     @app.after_request
     def after_request(response):
         # response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Credentials', request.getHeader("Origin"))
+        # 服务器端
+        # Access - Control - Allow - Credentials = true时，参数Access - Control - Allow - Origin
+        # 的值不能为
+        # '*' 。
+        origin = request.headers.get('Origin')
+        response.headers.add('Access-Control-Allow-Origin', origin)
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
         if request.method == 'OPTIONS':
             response.headers['Access-Control-Allow-Methods'] = 'DELETE, GET, POST, PUT'
             headers = request.headers.get('Access-Control-Request-Headers')
