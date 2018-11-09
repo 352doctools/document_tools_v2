@@ -28,25 +28,25 @@ def encode_auth_token(user_id, login_time):
         return e
 
 
-# 注销jwt 信息
-def destroy_auth_token(user_id, login_time):
-    try:
-        payload = {
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=0),
-            'iat': datetime.datetime.utcnow(),
-            'iss': 'ken',
-            'data': {
-                'id': user_id,
-                'login_time': login_time
-            }
-        }
-        return jwt.encode(
-            payload,
-            SECRET_KEY,
-            algorithm='HS256'
-        )
-    except Exception as e:
-        return e
+# # 注销jwt 信息
+# def destroy_auth_token(user_id, login_time):
+#     try:
+#         payload = {
+#             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=0),
+#             'iat': datetime.datetime.utcnow(),
+#             'iss': 'ken',
+#             'data': {
+#                 'id': user_id,
+#                 'login_time': login_time
+#             }
+#         }
+#         return jwt.encode(
+#             payload,
+#             SECRET_KEY,
+#             algorithm='HS256'
+#         )
+#     except Exception as e:
+#         return e
 
 
 # 解析jwt 信息

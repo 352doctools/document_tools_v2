@@ -67,6 +67,7 @@ def create_app():
     # 解决跨域问题
     # CORS(app, resources={r"/*": {"origins": "*"}}, send_wildcard=True)
     CORS(app, supports_credentials=True)
+    app.config["SESSION_COOKIE_HTTPONLY"] = False
 
 
     @app.before_request
