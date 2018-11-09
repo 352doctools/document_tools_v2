@@ -67,7 +67,9 @@ def create_app():
     # 解决跨域问题
     # CORS(app, resources={r"/*": {"origins": "*"}}, send_wildcard=True)
     CORS(app, supports_credentials=True)
-    app.config["SESSION_COOKIE_HTTPONLY"] = False
+    # app.config["SESSION_COOKIE_PATH"] = None
+    # app.config["SESSION_COOKIE_HTTPONLY"] = False
+
 
 
     @app.before_request
@@ -84,6 +86,7 @@ def create_app():
     @app.after_request
     def after_request(response):
         response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Credentials', 'True')
         if request.method == 'OPTIONS':
             response.headers['Access-Control-Allow-Methods'] = 'DELETE, GET, POST, PUT'
             headers = request.headers.get('Access-Control-Request-Headers')
