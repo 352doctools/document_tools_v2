@@ -77,8 +77,9 @@ def doc_create():
             if 'docname' in data.keys() and 'doctype' in data.keys():
                 new_doc = doc_dal.DocDal().insert_doc_and_get_doc(data)
                 if new_doc is not None:
-                    doc_id = new_doc['doc_id']
-                    return post_json('success', data=dict(docid=doc_id))
+                    # doc_id = new_doc['doc_id']
+                    # return post_json('success', data=dict(docid=doc_id))
+                    return post_json('success', '新建文档成功')
                 else:
                     return post_json('error', '新建文档出错')
             else:
@@ -88,27 +89,29 @@ def doc_create():
     else:
         return render_template('404.html')
 
+
 # 删除文档路由
 @doc.route('/doc_delete', methods=['GET', 'POST'])
 def doc_delete():
     if request.method == 'GET':
         return post_json('error', '请使用post方法')
     elif request.method == 'POST':
+        if g.string == 'token认证失败':
+            return post_json('error', g.string)
         if is_json(request.get_data()):
             data = json.loads(request.get_data())
-            if 'uid' in data.keys() and 'docid' in data.keys():
-                if UserDal.check_uid(data) is not None:
-                    rowcount = doc_dal.DocDal().delete_doc(data)
+            uid = jwt_utils.get_uid_token(request)[0]
+            data.update({'uid': uid})
+            if 'docid' in data.keys():
+                rowcount = doc_dal.DocDal().delete_doc(data)
+                if rowcount > 0:
+                    return post_json('success', '删除文档成功')
                 else:
-                    return post_json('error', '用户校验出错')
+                    return post_json('success', '删除文档出错')
             else:
                 return post_json('error', '输入参数不完整或者不正确')
         else:
             return post_json('error', '输入参数不完整或者不正确')
-        if rowcount > 0:
-            return post_json('success', '删除文档成功')
-        else:
-            return post_json('success', '删除文档出错')
     else:
         return render_template('404.html')
 
