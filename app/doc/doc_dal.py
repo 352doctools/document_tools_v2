@@ -192,6 +192,7 @@ class DocDal:
             doc_base_content = dict(cpcode=row['cpcode'], bcontent=row['bcontent'], cpchange="0")
             return doc_base_content
         return row
+
     # 得到用户文档的内容
     @classmethod
     def get_doc_content(cls, params):
