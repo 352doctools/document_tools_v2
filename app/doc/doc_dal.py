@@ -7,6 +7,7 @@ import uuid
 import re
 import decimal
 import os
+import urllib2
 import shutil
 import time
 try:
@@ -81,12 +82,23 @@ class DocDal:
         else:
             return None
         return doc.to_dict()
+
+
     # 通过docid得到文档
     @classmethod
     def get_docpath_by_id(cls, docid):
         sql = "select * from 352dt_doc_info where doc_id = %s and doc_state = 1"
         row = mysql_utils.Database().query_one(sql, (docid,))
         return row
+
+
+    # 通过key得到path
+    @classmethod
+    def get_doc_path_by_key(cls, key):
+        sql = "select * from 352dt_doc_info where doc_key = %s"
+        row = mysql_utils.Database().query_one(sql, (key,))
+        return row['doc_path']
+
 
     # 通过uid得到用户已编辑的文档列表
     @classmethod
@@ -614,4 +626,15 @@ class DocDal:
         template_dir = os.path.abspath(os.path.dirname(__file__) + '/' + '..' + '/' + '..' + '/template')
         user_doc_dir = os.path.abspath(os.path.dirname(__file__) + '/' + '..' + '/' + '..' + '/user-doc')
         shutil.copy(template_dir + '/' + template_name + ".docx", user_doc_dir + '/' + docpath)
+
+
+# 获取文档下载连接
+    @classmethod
+    def save_file(cls, url, doc_path):
+        user_doc_dir = os.path.abspath(os.path.dirname(__file__) + '/' + '..' + '/' + '..' + '/user-doc')
+        doc_path = user_doc_dir + '/' + doc_path
+        f = urllib2.urlopen(url)
+        stream = f.read()
+        with open(doc_path, "wb") as code:
+            code.write(stream)
 

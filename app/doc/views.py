@@ -62,6 +62,7 @@ def doc_temp():
     else:
         return render_template('404.html')
 
+
 # 新建路由
 @doc.route('/doc_create', methods=['GET', 'POST'])
 def doc_create():
@@ -116,6 +117,7 @@ def doc_delete():
     else:
         return render_template('404.html')
 
+
 # 获取文档章节目录路由
 @doc.route('/doc_chapter', methods=['GET', 'POST'])
 def doc_chapter():
@@ -148,6 +150,7 @@ def doc_chapter():
     else:
         return render_template('404.html')
 
+
 # 章节模块查询路由
 @doc.route('/doc_cl_check', methods=['GET', 'POST'])
 def get_doc_cl_check():
@@ -171,6 +174,7 @@ def get_doc_cl_check():
             return post_json('error', '输入参数不完整或者不正确')
     else:
         return render_template('404.html')
+
 
 # 计算数字标签数值
 @doc.route('/calc_nl_value', methods=['GET', 'POST'])
@@ -197,6 +201,7 @@ def calc_nl_value():
     else:
         return render_template('404.html')
 
+
 # 模块查询路由
 @doc.route('/doc_check_t', methods=['GET', 'POST'])
 def doc_check_t():
@@ -222,7 +227,27 @@ def doc_check_t():
     else:
         return render_template('404.html')
 
+
 # 文档暂存路由
+@doc.route('/doc_save', methods=['GET', 'POST'])
+def doc_save():
+    if is_json(request.get_data()):
+        data = json.loads(request.get_data())
+        if 'status' in data.keys() and 'url' in data.keys() and 'key' in data.keys():
+            if data['status'] == '2':
+                doc_path = doc_dal.DocDal().get_doc_path_by_key(data['key'])
+                url = data['url']
+                doc_dal.DocDal().save_file(url, doc_path)
+                return post_json('success', '保存成功')
+            else:
+                return "{\"error\":0}"
+        else:
+            return "{\"error\":0}"
+    else:
+        return "{\"error\":0}"
+
+
+# 文档保存路由
 @doc.route('/doc_save_temp', methods=['GET', 'POST'])
 def doc_save_temp():
     if request.method == 'GET':
@@ -246,6 +271,7 @@ def doc_save_temp():
             return post_json('error', '输入参数不完整或者不正确')
     else:
         return render_template('404.html')
+
 
 # 获取文档下载地址路由
 @doc.route('/doc_download', methods=['GET', 'POST'])
