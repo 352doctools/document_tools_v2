@@ -604,3 +604,14 @@ class DocDal:
             docid=params['docid'],
             docurl=request.url_root + 'download_file' + '?' + 'downloadFile=' + template_name + '_' + docpath,
         )
+
+    # 获取文档下载连接
+    @classmethod
+    def copy_file(cls, doc_type, doc_id):
+        template_name = cls.get_doc_template_name(doc_type)
+        template_name = template_name['dict_text']
+        docpath = cls.get_docpath_by_id(doc_id)['doc_path']
+        template_dir = os.path.abspath(os.path.dirname(__file__) + '/' + '..' + '/' + '..' + '/template')
+        user_doc_dir = os.path.abspath(os.path.dirname(__file__) + '/' + '..' + '/' + '..' + '/user-doc')
+        shutil.copy(template_dir + '/' + template_name + ".docx", user_doc_dir + '/' + docpath)
+

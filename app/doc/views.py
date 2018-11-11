@@ -79,6 +79,7 @@ def doc_create():
                 if new_doc is not None:
                     # doc_id = new_doc['doc_id']
                     # return post_json('success', data=dict(docid=doc_id))
+                    doc_dal.DocDal().copy_file(new_doc['doc_type'], new_doc['doc_id'])
                     return post_json('success', '新建文档成功')
                 else:
                     return post_json('error', '新建文档出错')
