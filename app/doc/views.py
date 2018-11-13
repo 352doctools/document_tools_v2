@@ -43,7 +43,7 @@ def get_doc_list():
             return post_json('error', g.string)
         uid = jwt_utils.get_uid_token(request)[0]
         doc_list = doc_dal.DocDal().get_doc_list({'uid': uid})
-        return post_json('success', data=dict(docinfo=doc_list,))
+        return post_json('success', data=doc_list)
 
     else:
         return render_template('404.html')

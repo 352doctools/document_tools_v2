@@ -112,11 +112,14 @@ class DocDal:
                                "/(select count(*) from 352dt_doc_base_content where doctype = %s " \
                                "and bcontent like %s) as result"
                 result = mysql_utils.Database().query_one(docstate_sql, (row['doc_id'], row['doc_type'], '%((%'))
+                doc_user_id_sql = "select uname from 352dt_user_info where uid = %s "
+                result_uname = mysql_utils.Database().query_one(doc_user_id_sql, (row['doc_user_id'],))
                 doc = dict(docid=row['doc_id'],
                            doctype=row['doc_type'],
                            docname=row['doc_name'],
                            docpath=row['doc_path'],
                            doc_user_id=row['doc_user_id'],
+                           doc_user_name=result_uname['uname'],
                            u_ids=row['u_ids'],
                            permission=row['permission'],
                            doc_key=row['doc_key'],
