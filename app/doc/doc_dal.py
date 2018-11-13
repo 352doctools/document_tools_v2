@@ -378,6 +378,35 @@ class DocDal:
         doc_cl_check['nllist'] = nllist
         return doc_cl_check
 
+
+    # 得到所有标签
+    @classmethod
+    def get_doc_keywords(cls, params):
+        keywords = dict()
+
+        sql = "select rlcode, rltype, rlname, rlsymbol, rlnote from 352dt_replace_label_dict where doctype = %s order by rlsymbol;"
+        rllist = mysql_utils.Database().query_all(sql, (params['doctype'],))
+
+        sql2 = "select tmcode, tmtype, tmname, tmsymbol, tmnote from 352dt_template_dict where doctype = %s order by tmsymbol;"
+        tmlist = mysql_utils.Database().query_all(sql2, (params['doctype'],))
+        for row in tmlist:
+            sql4 = "select tminputcode, tminputtext from 352dt_template_recommend_content where tmcode = %s group by tminputcode order by tminputcode"
+            tminputtypelist = mysql_utils.Database().query_all(sql4, (row['tmcode'],))
+            for row2 in tminputtypelist:
+                sql5 = "select tmcontentcode, tmcontent, tmsource from 352dt_template_recommend_content where tmcode = %s and tminputcode=%s order by tmcontentcode"
+                tminputlist = mysql_utils.Database().query_all(sql5, (row['tmcode'], row2['tminputcode']))
+                row2['tminputlist'] = tminputlist
+            row['tminputtypelist'] = tminputtypelist
+
+        sql3 = "select nlcode, nltype, nlname, nlcontent, nlsymbol, nlnote from 352dt_num_label_dict where doctype = %s order by nlsymbol;"
+        nllist = mysql_utils.Database().query_all(sql3, (params['doctype'],))
+
+        keywords['rllist'] = rllist
+        keywords['nllist'] = nllist
+        keywords['tmlist'] = tmlist
+        return keywords
+
+
     # 得到数字标签计算公式
     @classmethod
     def get_formula(cls, params):

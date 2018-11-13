@@ -151,6 +151,29 @@ def doc_chapter():
         return render_template('404.html')
 
 
+# 获取所有标签
+@doc.route('/doc_keywords', methods=['GET', 'POST'])
+def doc_keywords():
+    if request.method == 'GET':
+        return post_json('error', '请使用post方法')
+    elif request.method == 'POST':
+        if g.string == 'token认证失败':
+            return post_json('error', g.string)
+        if is_json(request.get_data()):
+            data = json.loads(request.get_data())
+            uid = jwt_utils.get_uid_token(request)[0]
+            data.update({'uid': uid})
+            if 'doctype' in data.keys():
+                keywords = doc_dal.DocDal().get_doc_keywords(data)
+                return post_json('success', data=keywords)
+            else:
+                return post_json('error', '输入参数不完整或者不正确')
+        else:
+            return post_json('error', '输入参数不完整或者不正确')
+    else:
+        return render_template('404.html')
+
+
 # 章节模块查询路由
 @doc.route('/doc_cl_check', methods=['GET', 'POST'])
 def get_doc_cl_check():
