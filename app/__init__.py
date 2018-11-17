@@ -75,7 +75,8 @@ def create_app():
     @app.before_request
     def before_request():
         if request.path == '/login' or request.path == '/register' \
-                or request.path == '/register_name_check' or request.path == '/doc_save':
+                or request.path == '/register_name_check' or request.path == '/doc_save' \
+                or request.path == '/doc_keywords':
             return None
         if not identify(request):
             g.string = 'token认证失败'

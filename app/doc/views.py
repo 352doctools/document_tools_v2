@@ -157,12 +157,8 @@ def doc_keywords():
     if request.method == 'GET':
         return post_json('error', '请使用post方法')
     elif request.method == 'POST':
-        if g.string == 'token认证失败':
-            return post_json('error', g.string)
         if is_json(request.get_data()):
             data = json.loads(request.get_data())
-            uid = jwt_utils.get_uid_token(request)[0]
-            data.update({'uid': uid})
             if 'doctype' in data.keys():
                 keywords = doc_dal.DocDal().get_doc_keywords(data)
                 return post_json('success', data=keywords)
