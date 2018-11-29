@@ -170,6 +170,33 @@ def doc_keywords():
         return render_template('404.html')
 
 
+# 获取文档类型关键字返回内容
+@doc.route('/doc_type_keyword', methods=['GET', 'POST'])
+def doc_type_keyword():
+    if request.method == 'GET':
+        return post_json('error', '请使用post方法')
+    elif request.method == 'POST':
+        if is_json(request.get_data()):
+            data = json.loads(request.get_data())
+            if 'doctype' in data.keys() and 'keyword' in data.keys():
+                if 'page' in data.keys():
+                    if str(data['page']).isdigit() and int(data['page']) > 0:
+                        contentlist = doc_dal.DocDal().get_doc_type_keyword(data)
+                        return post_json('success', data=contentlist)
+                    else:
+                        return post_json('error', '输入参数不完整或者不正确')
+                else:
+                    result = doc_dal.DocDal().get_doc_type_keyword(data)
+                    return post_json('success', data=result)
+            else:
+                return post_json('error', '输入参数不完整或者不正确')
+        else:
+            return post_json('error', '输入参数不完整或者不正确')
+    else:
+        return render_template('404.html')
+
+
+
 # 章节模块查询路由
 @doc.route('/doc_cl_check', methods=['GET', 'POST'])
 def get_doc_cl_check():

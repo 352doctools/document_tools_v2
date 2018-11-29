@@ -407,6 +407,40 @@ class DocDal:
         return keywords
 
 
+    # 得到类型文档关键字返回内容
+    @classmethod
+    def get_doc_type_keyword(cls, params):
+        contents = dict()
+        keyword = params['keyword']
+        if params.has_key('page'):
+            page = int(params['page'])
+        else:
+            page = 1
+
+        sql = "select tmcontent from 352dt_template_recommend_content_kw " \
+              "where tmkeyword1 = %s " \
+              "UNION all " \
+              "select tmcontent from 352dt_template_recommend_content_kw " \
+              "where tmkeyword2 = %s " \
+              "UNION all " \
+              "select tmcontent from 352dt_template_recommend_content_kw " \
+              "where tmkeyword_other like %s limit %s, %s"
+        sql2 = "select count(temp.tmcontent) as countNum from (select tmcontent from 352dt_template_recommend_content_kw " \
+              "where tmkeyword1 = %s " \
+              "UNION all " \
+              "select tmcontent from 352dt_template_recommend_content_kw " \
+              "where tmkeyword2 = %s " \
+              "UNION all " \
+              "select tmcontent from 352dt_template_recommend_content_kw " \
+              "where tmkeyword_other like %s) as temp"
+        countNum = mysql_utils.Database().query_one(sql2, (keyword, keyword, "%"+keyword+"%", ))
+        contentlist = mysql_utils.Database().query_all(sql, (keyword, keyword, "%"+keyword+"%", 10*(page-1), 10, ))
+
+        result = dict()
+        result['contentlist'] = contentlist
+        result = dict(countNum.items() + result.items())
+        return result
+
     # 得到数字标签计算公式
     @classmethod
     def get_formula(cls, params):
