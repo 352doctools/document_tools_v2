@@ -283,7 +283,7 @@ def doc_save():
             if data['status'] == '2':
                 doc_path = doc_dal.DocDal().get_doc_path_by_key(data['key'])
                 url = data['url']
-                doc_dal.DocDal().save_file(url, doc_path)
+                doc_dal.DocDal().save_file(url, doc_path, data['key'])
                 return post_json('success', '保存成功')
             else:
                 return "{\"error\":0}"

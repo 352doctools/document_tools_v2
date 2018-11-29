@@ -696,11 +696,13 @@ class DocDal:
 
 # 获取文档下载连接
     @classmethod
-    def save_file(cls, url, doc_path):
+    def save_file(cls, url, doc_path, key):
         user_doc_dir = os.path.abspath(os.path.dirname(__file__) + '/' + '..' + '/' + '..' + '/user-doc')
         doc_path = user_doc_dir + '/' + doc_path
         f = urllib2.urlopen(url)
         stream = f.read()
         with open(doc_path, "wb") as code:
             code.write(stream)
+        sql = "update 352dt_doc_info set utime = now() where doc_key = %s"
+        mysql_utils.Database().insert_del_update(sql, (key, ))
 
