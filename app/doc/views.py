@@ -282,7 +282,7 @@ def doc_save():
         with open("1.txt", "a") as code:
             code.write(request.path+"\n"+request.url+"\n"+request.get_data()+"\n")
         if 'status' in data.keys() and 'url' in data.keys() and 'key' in data.keys():
-            if data['status'] == '2':
+            if data['status'] == 2:
                 doc_path = doc_dal.DocDal().get_doc_path_by_key(data['key'])
                 url = data['url']
                 doc_dal.DocDal().save_file(url, doc_path, data['key'])
