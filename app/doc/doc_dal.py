@@ -103,7 +103,9 @@ class DocDal:
     # 通过uid得到用户已编辑的文档列表
     @classmethod
     def get_doc_list(cls, params):
-        sql = "select * from 352dt_doc_info where doc_user_id = %s and doc_state = 1 order by utime desc"
+        sql = "select 352dt_base_dict.dict_text, 352dt_doc_info.*  from 352dt_doc_info " \
+              "left join 352dt_base_dict on 352dt_doc_info.doc_type=352dt_base_dict.dict_name " \
+              "where doc_user_id = %s and doc_state = 1 order by utime desc"
         rows = mysql_utils.Database().query_all(sql, (params['uid'],))
         if len(rows) > 0:
             doc_list = []
@@ -115,7 +117,8 @@ class DocDal:
                 doc_user_id_sql = "select uname from 352dt_user_info where uid = %s "
                 result_uname = mysql_utils.Database().query_one(doc_user_id_sql, (row['doc_user_id'],))
                 doc = dict(docid=row['doc_id'],
-                           doctype=row['doc_type'],
+                           # doctype=row['doc_type'],
+                           doctype=row['dict_text'],
                            docname=row['doc_name'],
                            docpath=row['doc_path'],
                            doc_user_id=row['doc_user_id'],
