@@ -117,8 +117,8 @@ class DocDal:
                 doc_user_id_sql = "select uname from 352dt_user_info where uid = %s "
                 result_uname = mysql_utils.Database().query_one(doc_user_id_sql, (row['doc_user_id'],))
                 doc = dict(docid=row['doc_id'],
-                           # doctype=row['doc_type'],
-                           doctype=row['dict_text'],
+                           doctype=row['doc_type'],
+                           dicttext=row['dict_text'],
                            docname=row['doc_name'],
                            docpath=row['doc_path'],
                            doc_user_id=row['doc_user_id'],
